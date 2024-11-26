@@ -1,21 +1,39 @@
 # fPET Toolbox
 ![fPET Banner](img/github_banner.png)
+
+<!-- Meta Tags for SEO -->
+<!-- 
+<meta name="description" content="The fPET Toolbox is a MATLAB-based software for analyzing functional PET (fPET) data, providing advanced methods such as GLM and ICA for stimulation-induced changes and molecular connectivity analysis. Optimized for bolus + constant infusion protocols.">
+<meta name="keywords" content="fPET, functional PET, MATLAB toolbox, neuroimaging, molecular connectivity, glucose metabolism, General Linear Model, GLM, Independent Component Analysis, ICA, bolus infusion, PET imaging">
+<meta name="author" content="Andreas Hahn, Murray B. Reed, Rupert Lanzenberger">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-site-verification" content="YltUm-VMpDd2HAyCQG2pbuDLvu2kGjuVltmbNuEJx08" />
+-->
+
 A MATLAB toolbox for the analysis of functional PET (fPET) data.
 
 fPET enables the identification of stimulation-induced changes in glucose metabolism and neurotransmitter action as well as molecular connectivity. The toolbox offers various analysis approaches, including the General Linear Model (GLM), Independent Component Analysis (ICA) as well as molecular connectivity and covariance computation. It is optimized to handle fPET data that has been acquired using a bolus + constant infusion protocol with high temporal resolution (1–60 seconds), but other settings may be feasible.
 
 [Visit the fPET Toolbox webpage](https://www.meduniwien.ac.at/neuroimaging/fPET.html)
 
-## Authors
+---
+
+## Topics and Tags
+`#fPET` `#functionalPET` `#neuroimaging` `#MATLABToolbox`  
+`#PETImaging` `#GLMAnalysis` `#ICAAnalysis` `#MolecularConnectivity`  
+`#GlucoseMetabolism` `#NeurotransmitterAnalysis` `#BolusInfusion`  
+
+---
+
+## Authors and Affiliation
 - Andreas Hahn
 - Murray B. Reed
 - Rupert Lanzenberger
 
-#### Affiliation:
 Neuroimaging Labs, Department of Psychiatry and Psychotherapy,
 Medical University of Vienna, Austria
 
-## Key Features:
+## Key Features
 Capture stimulation-induced changes in glucose metabolism as well as dopamine and serotonin synthesis.
 
 Apply both hypothesis-driven (GLM) and data-driven (ICA) methods for analysis.
@@ -27,7 +45,7 @@ Supports a variety of imaging systems, radioligands, stimuli and species, provid
 ## Citation
 If you use the fPET Toolbox in your work, please cite the following paper:
 
-__A Hahn et al. (2024) coming soon....__
+__A Hahn et al. (2024) "A Unified Approach for Identifying PET-based Neuronal Activation and Molecular Connectivity with the functional PET toolbox" BioRxiv https://www.biorxiv.org/content/10.1101/2024.11.13.623377v1__
 
 
 ## Installation
@@ -42,7 +60,6 @@ Ensure you have the following dependencies installed:
 Note: SPM12 and fastICA are required for certain functions to work.
 
 ## Basic Usage
-#### Launching the GUI
 
 To run the toolbox, define the fpetbatch with the GUI by entering...
 ```matlab 
@@ -73,8 +90,8 @@ species:
 
 scanners:
 - GE Advance
-- Siemens mMR 3T
-- Siemens Biograph Vision 600
+- Siemens Biograph mMR 3T
+- Siemens Biograph Vision 600 Edge
 - Siemens Biograph Quadra
 - Brain Biosciences CerePET
 - Bruker small-animal PET insert for 7T ClinScan
@@ -96,7 +113,7 @@ For any issues, bug reports, feature requests, or study design consultations, pl
 - Murray B. Reed: murray.reed@meduniwien.ac.at
 
 
-### Collaborations
+## Collaborations
 We have successfully collaborated with various labs worldwide in Sweden, Finland, Norway, Germany, Australia, USA, Denmark and Spain, contributing to the field of fPET imaging. For example:
 
 - [Stiernman et al. (2020)](https://www.pnas.org/doi/full/10.1073/pnas.2021913118)
