@@ -37,9 +37,9 @@ fpet_defaults.glm.in.regr_motion_pca = 1;
 
 fpet_defaults.glm.in.regr_add = '';
 
-fpet_defaults.glm.in.filter.apply = 1;
-fpet_defaults.glm.in.filter.order = 6;     % half of actual filter order (bec filtfilt is used)
-fpet_defaults.glm.in.filter.cutoff = [];
+fpet_defaults.glm.in.fil.apply = 1;
+fpet_defaults.glm.in.fil.order = 6;     % half of actual filter order (bec filtfilt is used)
+fpet_defaults.glm.in.fil.cutoff = [];
 
 fpet_defaults.glm.in.data_incomplete.flag = [];
 fpet_defaults.glm.in.data_incomplete.start = [];
@@ -117,8 +117,8 @@ fpet_defaults.conn.in.regr_motion_incomplete = [];
 fpet_defaults.conn.in.regr_motion_pca = 1;
 
 fpet_defaults.conn.in.regr_add = '';
-fpet_defaults.conn.in.filter.order = 4;         % half of actual filter order (bec filtfilt is used)
-fpet_defaults.conn.in.filter.cutoff = [0.01 0.1];   % [Hz]
+% fpet_defaults.conn.in.fil.order = 4;         % half of actual filter order (bec filtfilt is used)
+% fpet_defaults.conn.in.fil.cutoff = [0.01 0.1];   % [Hz]
 
 
 % covariance

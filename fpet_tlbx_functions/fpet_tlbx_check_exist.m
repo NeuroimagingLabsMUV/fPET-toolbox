@@ -7,88 +7,78 @@ error_flag = 0;
 overwrite_flag = 0;
 exist_flag = zeros(1,7);
 
-if isfield(fpetbatch,'dir')
+if isfield(fpetbatch,'dir') && isfield(fpetbatch.dir,'result') && ~isempty(fpetbatch.dir.result)
     if ~exist(fpetbatch.dir.result, 'dir')
         mkdir(fpetbatch.dir.result);
     end
+else
+	fpetbatch.dir.result = pwd;
 end
 
 % glm
 if isfield(fpetbatch,'run_glm') && (fpetbatch.run_glm == 1)
-    if isfield(fpetbatch.dir,'result')
-        pnfn = fullfile(fpetbatch.dir.result, 'fPET_glm.mat');
-        if exist(pnfn, 'file')
-            load(pnfn);
-            if isfield(fPET,'glm') && isfield(fPET.glm,'complete') && (fPET.glm.complete == 1)
-                disp('GLM results already exist.')
-                exist_flag(1) = 1;
-            end
+    pnfn = fullfile(fpetbatch.dir.result, 'fPET_glm.mat');
+    if exist(pnfn, 'file')
+        load(pnfn);
+        if isfield(fPET,'glm') && isfield(fPET.glm,'complete') && (fPET.glm.complete == 1)
+            disp('GLM results already exist.')
+            exist_flag(1) = 1;
         end
     end
 end
 % psc
 if isfield(fpetbatch,'run_psc') && (fpetbatch.run_psc == 1)
-    if isfield(fpetbatch.dir,'result')
-        pnfn = fullfile(fpetbatch.dir.result, 'fPET_glm.mat');
-        if exist(pnfn, 'file')
-            load(pnfn);
-            if isfield(fPET,'psc') && isfield(fPET.psc,'complete') && (fPET.psc.complete == 1)
-                disp('PSC results already exist.')
-                exist_flag(2) = 1;
-            end
+    pnfn = fullfile(fpetbatch.dir.result, 'fPET_glm.mat');
+    if exist(pnfn, 'file')
+        load(pnfn);
+        if isfield(fPET,'psc') && isfield(fPET.psc,'complete') && (fPET.psc.complete == 1)
+            disp('PSC results already exist.')
+            exist_flag(2) = 1;
         end
     end
 end
 % quant
 if isfield(fpetbatch,'run_quant') && (fpetbatch.run_quant == 1)
-    if isfield(fpetbatch.dir,'result')
-        pnfn = fullfile(fpetbatch.dir.result, 'fPET_glm.mat');
-        if exist(pnfn, 'file')
-            load(pnfn);
-            if isfield(fPET,'quant') && isfield(fPET.quant,'complete') && (fPET.quant.complete == 1)
-                disp('Quantification results already exist.')
-                exist_flag(3) = 1;
-            end
+    pnfn = fullfile(fpetbatch.dir.result, 'fPET_glm.mat');
+    if exist(pnfn, 'file')
+        load(pnfn);
+        if isfield(fPET,'quant') && isfield(fPET.quant,'complete') && (fPET.quant.complete == 1)
+            disp('Quantification results already exist.')
+            exist_flag(3) = 1;
         end
     end
 end
 % tacplot -> no check required
 % ica
 if isfield(fpetbatch,'run_ica') && (fpetbatch.run_ica == 1)
-    if isfield(fpetbatch.dir,'result')
-        pnfn = fullfile(fpetbatch.dir.result, 'fPET_ica.mat');
-        if exist(pnfn, 'file')
-            load(pnfn);
-            if isfield(fPET,'ica') && isfield(fPET.ica,'complete') && (fPET.ica.complete == 1)
-                disp('ICA results already exist.')
-                exist_flag(5) = 1;
-            end
+    pnfn = fullfile(fpetbatch.dir.result, 'fPET_ica.mat');
+    if exist(pnfn, 'file')
+        load(pnfn);
+        if isfield(fPET,'ica') && isfield(fPET.ica,'complete') && (fPET.ica.complete == 1)
+            disp('ICA results already exist.')
+            exist_flag(5) = 1;
         end
     end
 end
 % conn
 if isfield(fpetbatch,'run_conn') && (fpetbatch.run_conn == 1)
-    if isfield(fpetbatch.dir,'result')
-        pnfn = fullfile(fpetbatch.dir.result, 'fPET_conn.mat');
-        if exist(pnfn, 'file')
-            load(pnfn);
-            if isfield(fPET,'conn') && isfield(fPET.conn,'complete') && (fPET.conn.complete == 1)
-                disp('Connectivity results already exist.')
-                exist_flag(6) = 1;
-            end
+    pnfn = fullfile(fpetbatch.dir.result, 'fPET_conn.mat');
+    if exist(pnfn, 'file')
+        load(pnfn);
+        if isfield(fPET,'conn') && isfield(fPET.conn,'complete') && (fPET.conn.complete == 1)
+            disp('Connectivity results already exist.')
+            exist_flag(6) = 1;
         end
     end
 end
 % cov
 if isfield(fpetbatch,'run_cov') && (fpetbatch.run_cov == 1)
-    if isfield(fpetbatch.dir,'result')
-        pnfn = fullfile(fpetbatch.dir.result, 'fPET_cov.mat');
-        if exist(pnfn, 'file')
-            load(pnfn);
-            if isfield(fPET,'cov') && isfield(fPET.cov,'complete') && (fPET.cov.complete == 1)
-                disp('Covariance results already exist.')
-                exist_flag(7) = 1;
-            end
+    pnfn = fullfile(fpetbatch.dir.result, 'fPET_cov.mat');
+    if exist(pnfn, 'file')
+        load(pnfn);
+        if isfield(fPET,'cov') && isfield(fPET.cov,'complete') && (fPET.cov.complete == 1)
+            disp('Covariance results already exist.')
+            exist_flag(7) = 1;
         end
     end
 end
@@ -150,7 +140,7 @@ if (overwrite_flag == 1) || (isfield(fpetbatch,'overwrite') && (fpetbatch.overwr
         pnfn = fullfile(fpetbatch.dir.result, 'fPET_glm.mat');
         load(pnfn);
         nr_regr_stim = size(fPET.glm.X.stim.d,2);
-        for ind = 1:nr_regr_stim
+        for ind = 1:nr_regr_stim+1
             pnfn = fullfile(fPET.dir.result, sprintf('b%i_%s_Ki.nii', ind+1, fPET.glm.X.name{ind+1}));
             delete(pnfn);
             pnfn = fullfile(fPET.dir.result, sprintf('b%i_%s_CMRGlu.nii', ind+1, fPET.glm.X.name{ind+1}));

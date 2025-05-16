@@ -22,8 +22,8 @@ for ind = 1:size(M.calc.d_re,1)
     if M.calc.d_re(ind)
         tac = double(Y.d_re(ind,:));
         if any(tac)
-            if fPET.glm.filter.apply == 1
-                tac = filtfilt(fPET.glm.filter.b, fPET.glm.filter.a, tac);
+            if fPET.glm.fil.apply == 1
+                tac = filtfilt(fPET.glm.fil.b, fPET.glm.fil.a, tac);
             end
             % adding anchor point for incomplete data (advanced)
             if (fPET.Y.incomplete == 1) && (fPET.glm.X.incomplete.start(1) ~= 1)
@@ -41,6 +41,7 @@ end
 
 % save data
 R.h_temp = Y.h_orig(1);
+R.h_temp.dt(1) = 16;        % single
 for ind = 1:size(R.b_re,2)
     R.h_temp.fname = fullfile(fPET.dir.result, sprintf('b%i_%s.nii', ind, fPET.glm.X.name{ind}));
     spm_write_vol(R.h_temp, reshape(R.b_re(:,ind), R.h_temp.dim));
@@ -51,6 +52,8 @@ for ind = 1:size(R.t_re,2)
 end
 R.h_temp.fname = fullfile(fPET.dir.result, 'residuals.nii');
 spm_write_vol(R.h_temp, reshape(R.r_re, R.h_temp.dim));
+R.h_temp.fname = fullfile(fPET.dir.result, 'mask_bl.nii');
+spm_write_vol(R.h_temp, fPET.glm.M.bl.d);
 
 fPET.glm.complete = 1;
 save(fullfile(fPET.dir.result, 'fPET_glm.mat'), 'fPET');

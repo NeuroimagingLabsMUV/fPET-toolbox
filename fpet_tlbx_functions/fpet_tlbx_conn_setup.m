@@ -5,9 +5,10 @@ function [Y, pn] = fpet_tlbx_conn_setup(fpetbatch);
 
 % load defaults
 fpet_defaults = fpet_tlbx_defaults();
+fPET.v = fpetbatch.v;
 
 % result directory
-if isfield(fpetbatch.dir,'result') && ~isempty(fpetbatch.dir.result)
+if isfield(fpetbatch,'dir') && isfield(fpetbatch.dir,'result') && ~isempty(fpetbatch.dir.result)
     fPET.dir.result = fpetbatch.dir.result;
 else
     fPET.dir.result = pwd;
@@ -75,7 +76,7 @@ if isfield(fpetbatch.conn.in,'regr_motion') && ~isempty(fpetbatch.conn.in.regr_m
         X.motion.d(end-fPET.conn.X.rem.end+1:end,:) = [];
     end
     % PCA, perform by default, use tradeoff
-    if ~isfield(fpetbatch.conn.in,'regr_motion_pca') || (fpetbatch.conn.in.regr_motion_pca == 1)
+    if ~isfield(fpetbatch.conn.in,'regr_motion_pca') || isempty(fpetbatch.conn.in.regr_motion_pca) || (fpetbatch.conn.in.regr_motion_pca == 1)
         [~, score, ~, ~, exp] = pca(X.motion.d);
         numberOfComponents = findElbow(exp);
         X.motion.d_final = zscore(score(:,1:numberOfComponents));
@@ -107,6 +108,10 @@ end
 fPET.conn.X.add = X.add;
 
 % baseline removal
+if ~isfield(fpetbatch.conn.in,'bl_type') || isempty(fpetbatch.conn.in.bl_type)
+    fpetbatch.conn.in.bl_type = fpet_defaults.conn.in.bl_type;
+end
+
 % average tac +/- 3rd order polynomial fitting
 fPET.conn.X.bl = [];
 if fpetbatch.conn.in.bl_type == 1 || fpetbatch.conn.in.bl_type == 2
@@ -128,6 +133,7 @@ if fpetbatch.conn.in.bl_type == 1 || fpetbatch.conn.in.bl_type == 2
     X.bl(isnan(X.bl)) = 0;
     
     % mask fitted with third order polynomial
+    % data before fit is removed
     if fpetbatch.conn.in.bl_type == 2
         if fpetbatch.conn.in.time == 1
             bl_start_fit = round(fpetbatch.conn.in.bl_start_fit/fpetbatch.conn.in.framelength);
@@ -135,11 +141,12 @@ if fpetbatch.conn.in.bl_type == 1 || fpetbatch.conn.in.bl_type == 2
             bl_start_fit = fpetbatch.conn.in.bl_start_fit;
         end
         x = [bl_start_fit:numel(X.bl)]';
-        X_temp = [X.motion.d_final X.add.d];
-        b = glmfit([x x.^2 x.^3 X_temp(bl_start_fit:end,:)], X.bl(bl_start_fit:end));
-        bl_fit = b(1) + b(2)*x + b(3)*(x.^2) + b(4)*(x.^3);
-        X.bl = [X.bl(1:bl_start_fit-1); bl_fit];
+        fPET.conn.X.motion.d_final = fPET.conn.X.motion.d_final(bl_start_fit:end,:);
+        fPET.conn.X.add.d = fPET.conn.X.add.d(bl_start_fit:end,:);
+        fPET.tvec = fPET.tvec(bl_start_fit:end);
         fPET.conn.X.start_fit = bl_start_fit;
+        b = glmfit([x x.^2 x.^3 fPET.conn.X.motion.d_final fPET.conn.X.add.d], X.bl(bl_start_fit:end));
+        X.bl = b(1) + b(2)*x + b(3)*(x.^2) + b(4)*(x.^3);
     end
     fPET.conn.X.bl = X.bl;
 
@@ -165,23 +172,23 @@ elseif fpetbatch.conn.in.bl_type == 4
 % bandpass filter
 elseif fpetbatch.conn.in.bl_type == 5
     % NOT yet fully tested, use at own risk
-    if ~isfield(fpetbatch.conn.in.filter,'order') || isempty(fpetbatch.conn.in.filter.order)
-        filter.order = fpet_defaults.conn.in.filter.order;
+    if ~isfield(fpetbatch.conn.in.fil,'order') || isempty(fpetbatch.conn.in.fil.order)
+        fil.order = fpet_defaults.conn.in.fil.order;
     else
-        filter.order = round(fpetbatch.conn.in.filter.order/2);
+        fil.order = round(fpetbatch.conn.in.fil.order/2);
     end
-    if ~isfield(fpetbatch.conn.in.filter,'cutoff') || isempty(fpetbatch.conn.in.filter.cutoff)
-        filter.cutoff = fpet_defaults.conn.in.filter.cutoff;
+    if ~isfield(fpetbatch.conn.in.fil,'cutoff') || isempty(fpetbatch.conn.in.fil.cutoff)
+        fil.cutoff = fpet_defaults.conn.in.fil.cutoff;
     else
         if fpetbatch.conn.in.time == 1
-            filter.cutoff = 1/fpetbatch.conn.in.filter.cutoff;
+            fil.cutoff = 1/fpetbatch.conn.in.fil.cutoff;
         elseif fpetbatch.conn.in.time == 2
-            filter.cutoff = 1/(fpetbatch.conn.in.filter.cutoff*fpetbatch.conn.in.framelength);
+            fil.cutoff = 1/(fpetbatch.conn.in.fil.cutoff*fpetbatch.conn.in.framelength);
         end
     end
-    filter.f_nyq = (1/fpetbatch.conn.in.framelength)/2;
-    [filter.b, filter.a] = butter(filter.order, filter.cutoff/filter.f_nyq, 'bandpass');
-    fPET.conn.filter = filter;
+    fil.f_nyq = (1/fpetbatch.conn.in.framelength)/2;
+    [fil.b, fil.a] = butter(fil.order, fil.cutoff/fil.f_nyq, 'bandpass');
+    fPET.conn.fil = fil;
     
 end
 fPET.conn.bl_type = fpetbatch.conn.in.bl_type;

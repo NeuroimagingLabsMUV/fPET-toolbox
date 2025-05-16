@@ -34,11 +34,11 @@ switch menu
     case 3
         switch row
             case 1
-                text = {'Variable: fpetbatch.glm.in.filter.apply'; 'Flag used to apply a low-pass filter on the 4D imaging data before being entered into the GLM. Options: true (default)/false.'};
+                text = {'Variable: fpetbatch.glm.in.fil.apply'; 'Flag used to apply a low-pass filter on the 4D imaging data before being entered into the GLM. Options: true (default)/false.'};
             case 2
-                text = {'Variable: fpetbatch.glm.in.filter.order'; 'Low-pass filter order.'};
+                text = {'Variable: fpetbatch.glm.in.fil.order'; 'Low-pass filter order.'};
             case 3
-                text = {'Variable: fpetbatch.glm.in.filter.cutoff'; 'Cutoff frequency for low-pass filter given in seconds or frames. Use half of task length as default.'};
+                text = {'Variable: fpetbatch.glm.in.fil.cutoff'; 'Cutoff frequency for low-pass filter given in seconds or frames. Use half of task length as default.'};
             case 4
                 text = {'Variable: fpetbatch.glm.in.regr_motion'; 'Motion nuisance regressors from the SPM realignment step. Input is a .txt or .mat file'};
             case 5
@@ -49,12 +49,10 @@ switch menu
     case 4
         switch row
             case 1
-                text = {'Variable: fpetbatch.glm.in.stim_dur'; 'Stimulus duration'};
-            case 2
                 text = {'Variable: fpetbatch.glm.in.regr'; 'Option to add task-induced regressors to the GLM, Input: name, onset(s) and end(s) of each task of interest. For multiple start or end points, use a comma "," to seperate each input.'};
-            case 3
+            case 2
                 text = 'Option to copy a previously existing task regressor.';
-            case 4
+            case 3
                 text = 'Option to remove preexisting task regressors';
         end
     case 5
@@ -72,14 +70,16 @@ switch menu
             case 6
                 text = {'Variable: fpetbatch.quant.in.pwbr'; 'Path and file name for the plasma/whole-blood file for estimation.'};
             case 7
-                text = {'Variable: fpetbatch.quant.in.pwbr_fit'; 'Fit method used to estimate the plasma/whole-blood ratio. Options: Average (default)/Linear fit'};
+                text = {'Variable: fpetbatch.quant.in.parent'; 'Path and file name for the parent fraction.'};
             case 8
-                text = {'Variable: fpetbatch.quant.in.lc'; 'Input lumped constant for quantification. Default: 0.89.'};
+                text = {'Variable: fpetbatch.quant.in.pwbr_fit'; 'Fit Method for Plasma/Whole-Blood Ratio. Options: Average (default)/Linear fit'};
             case 9
-                text = {'Variable: fpetbatch.quant.in.vb'; 'Input for fractional whole-blood volume. Default: 0.05.'};
+                text = {'Variable: fpetbatch.quant.in.lc'; 'Input lumped constant for quantification. Default: 0.89.'};
             case 10
-                text = {'Variable: fpetbatch.quant.in.bloodlvl'; 'Input for participants blood glucose level.'};
+                text = {'Variable: fpetbatch.quant.in.vb'; 'Input for fractional whole-blood volume. Default: 0.05.'};
             case 11
+                text = {'Variable: fpetbatch.quant.in.bloodlvl'; 'Input for participants blood glucose level.'};
+            case 12
                 text = {'Variable: fpetbatch.quant.in.tstar'; 'Input T*, which is the time to start fit of Patlak plot, given as fraction of full scan duration. Default=1/3 of scan duration'};
         end
     case 6
@@ -130,21 +130,21 @@ switch menu
                 text = {'Variable: fpetbatch.conn.in.bl_start_fit'; 'Starting point for baseline removal used for both 3rd order polynomial detrending options.'};
             case 5
                 text = {'Variable: fpetbatch.conn.in.atlas'; 'Atlas used to estimate the connectivity matrices.'};
+          %  case 6
+          %      text = {'Variable: fpetbatch.conn.in.fil.order'; 'If band-pass filter is selected. Input filter order.'};
+          %  case 7
+          %      text = {'Variable: fpetbatch.conn.in.fil.cutoff'; 'If band-pass filter is selected. Input cut-off frquency.'};
             case 6
-                text = {'Variable: fpetbatch.conn.in.filter.order'; 'If band-pass filter is selected. Input filter order.'};
-            case 7
-                text = {'Variable: fpetbatch.conn.in.filter.cutoff'; 'If band-pass filter is selected. Input cut-off frquency.'};
-            case 8
                 text = {'Variable: fpetbatch.conn.in.regr_motion'; 'Input nuisance motion regressors file'};
-            case 9
+            case 7
                 text = {'Variable: fpetbatch.conn.in.regr_motion_pca'; 'Flag to apply PCA dimentionality reduction to the nuisance regressors. Options: true (default)/false.'};
-            case 10
+            case 8
                 text = {'Variable: fpetbatch.conn.in.regr_add'; 'Input of additional nuisance regressors to compute'};
-            case 11
+            case 9
                 text = {'Variable: fpetbatch.conn.in.mask_bl'; ''; '[Mandatory]'; ''; 'Mask used to define the baseline, which in turn is used to detrend the input data.'};
-            case 12
+            case 10
                 text = {'Variable: fpetbatch.conn.in.framelength'; ''; '[Mandatory]'; ''; 'Frame length (TR) of the input data in seconds.'};
-            case 13
+            case 11
                 text = {'Variable: fpetbatch.conn.in.time'; '[Mandatory]'; ''; 'Tempral unit of input data. Options: (Frames/Seconds)'};
         end
     case 9

@@ -8,22 +8,22 @@ handles = guidata(src);
 fpetbatch = updateDefaultsWrapper(handles, fpetbatch);
 if isfield(handles, 'SavedInputs')
     if isfield(handles.SavedInputs, 'T1R4C2')
-        fpetbatch.glm.in.data = cellstr(handles.SavedInputs.T1R4C2); %glm
+        fpetbatch.glm.in.data = (handles.SavedInputs.T1R4C2); %glm
     end
     if isfield(handles.SavedInputs, 'T2R3C2')
-        fpetbatch.glm.in.mask.bl_excl = cellstr(handles.SavedInputs.T2R3C2);   %glm mask
+        fpetbatch.glm.in.mask.bl_excl = (handles.SavedInputs.T2R3C2);   %glm excl mask
     end
-    if isfield(handles.SavedInputs, 'T7R4C2')
-        fpetbatch.tacplot.in.dir = cellstr(handles.SavedInputs.T7R4C2); %TAC
+    if isfield(handles.SavedInputs, 'T7R3C2')
+        fpetbatch.tacplot.in.dir = (handles.SavedInputs.T7R3C2); %TAC
     end
     if isfield(handles.SavedInputs, 'T8R2C2')
-        fpetbatch.conn.in.data = cellstr(handles.SavedInputs.T8R2C2); %conn
+        fpetbatch.conn.in.data = (handles.SavedInputs.T8R2C2); %conn
     end
     if isfield(handles.SavedInputs, 'T10R2C2')
-        fpetbatch.cov.in.data = cellstr(handles.SavedInputs.T10R2C2); %cov
+        fpetbatch.cov.in.data = (handles.SavedInputs.T10R2C2); %cov
     end
     if isfield(handles.SavedInputs, 'T11R2C2')
-        fpetbatch.ica.in.data = cellstr(handles.SavedInputs.T11R2C2); %ica
+        fpetbatch.ica.in.data = (handles.SavedInputs.T11R2C2); %ica
     end
 end
 [file, path] = uiputfile('*.mat', 'Save Batch As');

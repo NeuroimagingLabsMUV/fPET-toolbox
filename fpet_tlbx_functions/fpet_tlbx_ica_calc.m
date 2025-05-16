@@ -19,37 +19,41 @@ for ind = 1:numel(fPET.ica.files)
     
     Y.d_re = reshape(Y.d, numel(Y.d(:,:,:,1)), size(Y.d,4));
     Y.d_re = Y.d_re(M.calc.d_re==1,:);
-    % dimensionality reduction
+    
+    % WB normalization [Haas/Bravo 2024]
+    Y.d_re = Y.d_re./nanmean(Y.d_re);
+    Y.d_re = zscore(Y.d_re, 0, 2);
+    % dimensionality reduction [Li 2020]
     if fPET.ica.pca == 1
-        coeff = pca(Y.d_re, 'NumComponents', fPET.ica.pc);
-        Y.d_red_re = coeff * (coeff' * Y.d_re');
+        Y.d_re = Y.d_re';
+        [coeff, sco] = pca(Y.d_re, 'NumComponents', fPET.ica.pc);
+        Y.d_pca_re = (coeff * (coeff' * Y.d_re'))';
     else
-        Y.d_red_re = Y.d_re';
+        Y.d_pca_re = Y.d_re';
     end
-    Y.d_red_re = zscore(Y.d_red_re, 0, 2); % temporal zscore
-%     Y.d_red_re = detrend(Y.d_red_re, 3);    % detrend
-    Y_d_all_re = [Y_d_all_re; Y.d_red_re];
+    Y.d_pca_re = zscore(Y.d_pca_re, 0, 2);
+    Y_d_all_re = [Y_d_all_re; Y.d_pca_re];
 end
 
 % group
 if numel(fPET.ica.files) > 1
-    % dimensionality reduction over entire group
+    % dimensionality reduction over entire group [Li 2020]
     if fPET.ica.pca == 1
         coeff = pca(Y_d_all_re', 'NumComponents', fPET.ica.pc);
-        Y_d_all_red_re = coeff * (coeff' * Y_d_all_re);
+        Y_d_all_pca_re = coeff * (coeff' * Y_d_all_re);
     else
-        Y_d_all_red_re = Y_d_all_re;
+        Y_d_all_pca_re = Y_d_all_re;
     end
-    Y_d_all_red_re = zscore(Y_d_all_red_re, 0, 1);
+    Y_d_all_pca_re = zscore(Y_d_all_pca_re, 0, 2);
     prefix = 'gic'; % group ica prefix
 else
-    Y_d_all_red_re = Y_d_all_re;
+    Y_d_all_pca_re = Y_d_all_re;
     prefix = 'ic'; % single subject prefix
 end
 
 % perform fastICA on either group or individual level
 for ind = 1:10
-    [R.d_re(ind).temp, R.d_re(ind).mix_matr, R.d_re(ind).sep_matr] = fastica(Y_d_all_red_re, 'numOfIC',fPET.ica.ic, 'approach','symm', 'g','tanh', 'stabilization','on', 'verbose','off');
+    [R.d_re(ind).temp, R.d_re(ind).mix_matr, R.d_re(ind).sep_matr] = fastica(Y_d_all_pca_re, 'numOfIC',fPET.ica.ic, 'approach','symm', 'g','tanh', 'stabilization','on', 'verbose','off');
     kt(:,ind) = kurtosis(R.d_re(ind).temp,0,2);
 end
 [kt_sort, kt_sind] = sort(kt, 'descend');
@@ -63,9 +67,11 @@ fPET.ica.R.sep_matr = R.d_re(ind_max).sep_matr;
 
 % save data
 R.h_temp = fPET.Y(1).h_orig(1);
+R.h_temp.dt(1) = 16;        % single
 for ind = 1 : size(R.d_final_re,1)
     R.h_temp.fname = fullfile(fPET.dir.result, [prefix num2str(ind) '.nii']);
-    R.d_final = reshape(zscore(R.d_final_re(ind,:)), size(Y.d,1:3));
+%     R.d_final = reshape(zscore(R.d_final_re(ind,:)), size(Y.d,1:3));
+    R.d_final = reshape(zscore(R.d_final_re(ind,:)), [size(Y.d,1) size(Y.d,2) size(Y.d,3)]);
     spm_write_vol(R.h_temp,R.d_final);
 end
 

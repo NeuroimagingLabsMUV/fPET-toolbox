@@ -13,8 +13,8 @@ if isfield(handles, 'SavedInputs')
     if isfield(handles.SavedInputs, 'T2R3C2')
         fpetbatch.glm.in.mask.bl_excl = (handles.SavedInputs.T2R3C2);   %glm excl mask
     end
-    if isfield(handles.SavedInputs, 'T7R4C2')
-        fpetbatch.tacplot.in.dir = (handles.SavedInputs.T7R4C2); %TAC
+    if isfield(handles.SavedInputs, 'T7R3C2')
+        fpetbatch.tacplot.in.dir = (handles.SavedInputs.T7R3C2); %TAC
     end
     if isfield(handles.SavedInputs, 'T8R2C2')
         fpetbatch.conn.in.data = (handles.SavedInputs.T8R2C2); %conn

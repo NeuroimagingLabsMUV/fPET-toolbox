@@ -43,6 +43,7 @@ for ind = 1:nr_regr_stim+1
         R.h = B.stim.h;
         R.h.fname = fullfile(fPET.dir.result, sprintf('b%i_%s_Ki.nii', ind+1, fPET.glm.X.name{ind+1}));
     end
+    R.h.dt(1) = 16;        % single
     for ind_v = 1:size(B_temp,1)
         if (B_temp(ind_v))
             tac = X_temp * B_temp(ind_v);

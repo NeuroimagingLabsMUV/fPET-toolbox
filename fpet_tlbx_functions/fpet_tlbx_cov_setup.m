@@ -3,8 +3,10 @@ function pn = fpet_tlbx_cov_setup(fpetbatch);
 % 
 % Copyright (C) 2024, Neuroimaging Labs, Medical University of Vienna, Austria
 
+fPET.v = fpetbatch.v;
+
 % result directory
-if isfield(fpetbatch.dir,'result') && ~isempty(fpetbatch.dir.result)
+if isfield(fpetbatch,'dir') && isfield(fpetbatch.dir,'result') && ~isempty(fpetbatch.dir.result)
     fPET.dir.result = fpetbatch.dir.result;
 else
     fPET.dir.result = pwd;

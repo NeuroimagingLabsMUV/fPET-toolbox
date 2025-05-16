@@ -1,4 +1,4 @@
-function fpetbatch = updatefpetbatchWrapper(handles, fpetbatch)
+function fpetbatch = updateDefaultsWrapper(handles, fpetbatch)
 % fPET toolbox: fpetbatch batch wrapper function
 % 
 % Copyright (C) 2024, Neuroimaging Labs, Medical University of Vienna, Austria

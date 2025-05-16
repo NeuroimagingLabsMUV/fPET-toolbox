@@ -9,6 +9,11 @@ load(fullfile(pn,'fPET_conn.mat'));
 M.atlas.d_re = reshape(fPET.conn.M.atlas.d, numel(fPET.conn.M.atlas.d), 1);
 Y.d_re = reshape(Y.d, numel(Y.d(:,:,:,1)), size(Y.d,4));
 
+% for polynomial data before fit is removed
+if fPET.conn.bl_type == 2 || fPET.conn.bl_type == 3
+    Y.d_re = Y.d_re(:,fPET.conn.X.start_fit:end);
+end
+
 % remove baseline tracer uptake
 R.rvxl_re = zeros(size(Y.d_re));
 % average tac +/- 3rd order polynomial fitting
@@ -47,7 +52,7 @@ elseif fPET.conn.bl_type == 5
         if M.atlas.d_re(ind) ~= 0
             tac = double(Y.d_re(ind,:));
             if any(tac)
-                R.rvxl_re(ind,:) = filtfilt(fPET.conn.filter.b, fPET.conn.filter.a, tac);
+                R.rvxl_re(ind,:) = filtfilt(fPET.conn.fil.b, fPET.conn.fil.a, tac);
             end
         end
     end
@@ -67,9 +72,7 @@ if fPET.conn.bl_type == 1 || fPET.conn.bl_type == 2
     R.rROI = tac;
 
 % each ROI separately fitted with 3rd order polynomial fitting
-% data before fit is removed
 elseif fPET.conn.bl_type == 3
-    Y.d_re = Y.d_re(:,fPET.conn.X.start_fit:end);
     R.rROI = zeros(size(tac));
     X = [fPET.conn.X.bl fPET.conn.X.motion.d_final fPET.conn.X.add.d];
     for ind = 1:numel(nr_roi)

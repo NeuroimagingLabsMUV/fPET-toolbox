@@ -30,8 +30,8 @@ if fpetbatch.tacplot.in.type == 1
 
         if any(tac_temp)
             % apply filter
-            if fPET.glm.filter.apply == 1
-                tac_temp = filtfilt(fPET.glm.filter.b, fPET.glm.filter.a, tac_temp);
+            if fPET.glm.fil.apply == 1
+                tac_temp = filtfilt(fPET.glm.fil.b, fPET.glm.fil.a, tac_temp);
             end
             % adding anchor point for incommplete data (advanced)
             if (fPET.Y.incomplete == 1) && (fPET.glm.X.incomplete.start(1) ~= 1)
@@ -112,16 +112,20 @@ elseif fpetbatch.tacplot.in.type == 2
 
         Y.d_re = reshape(Y.d, numel(Y.d(:,:,:,1)), size(Y.d,4));
         Y.d_re = Y.d_re(M.calc.d_re==1,:);
-        % dimensionality reduction
+        
+        % WB normalization [Haas/Bravo 2024]
+        Y.d_re = Y.d_re./nanmean(Y.d_re);
+        Y.d_re = zscore(Y.d_re, 0, 2);
+        % dimensionality reduction [Li 2020]
         if fPET.ica.pca == 1
-            coeff = pca(Y.d_re, 'NumComponents', fPET.ica.pc);
-            Y.d_red_re = coeff * (coeff' * Y.d_re');
+            Y.d_re = Y.d_re';
+            [coeff, sco] = pca(Y.d_re, 'NumComponents', fPET.ica.pc);
+            Y.d_pca_re = (coeff * (coeff' * Y.d_re'))';
         else
-            Y.d_red_re = Y.d_re';
+            Y.d_pca_re = Y.d_re';
         end
-        Y.d_red_re = zscore(Y.d_red_re, 0, 2); % temporal zscore
-%         Y.d_red_re = detrend(Y.d_red_re, 3);    % detrend
-        Y_d_all_re = [Y_d_all_re; Y.d_red_re];
+        Y.d_pca_re = zscore(Y.d_pca_re, 0, 2);
+        Y_d_all_re = [Y_d_all_re; Y.d_pca_re];
     end
 
     % group
@@ -129,13 +133,13 @@ elseif fpetbatch.tacplot.in.type == 2
         % dimensionality reduction over entire group
         if fPET.ica.pca == 1
             coeff = pca(Y_d_all_re', 'NumComponents', fPET.ica.pc);
-            Y_d_all_red_re = coeff * (coeff' * Y_d_all_re);
+            Y_d_all_pca_re = coeff * (coeff' * Y_d_all_re);
         else
-            Y_d_all_red_re = Y_d_all_re;
+            Y_d_all_pca_re = Y_d_all_re;
         end
-        Y_d_all_red_re = zscore(Y_d_all_red_re, 0, 1);
+        Y_d_all_pca_re = zscore(Y_d_all_pca_re, 0, 2);
     else
-        Y_d_all_red_re = Y_d_all_re;
+        Y_d_all_pca_re = Y_d_all_re;
     end
 
     % mask of task effects
@@ -149,9 +153,9 @@ elseif fpetbatch.tacplot.in.type == 2
     
     % extract tac, average, apply separation matrix 
     for ind_ic = 1:numel(fpetbatch.tacplot.in.ic_nr)
-        tac_all = Y_d_all_red_re(:,M.plot.d_re==1);
+        tac_all = Y_d_all_pca_re(:,M.plot.d_re==1);
         tac_all = mean(tac_all,2);
-        tac_all = tac_all.*(fPET.ica.R.sep_matr(fpetbatch.tacplot.in.ic_nr(ind_ic),:)');
+%         tac_all = tac_all.*(fPET.ica.R.sep_matr(fpetbatch.tacplot.in.ic_nr(ind_ic),:)');
         nr_frames = zeros(numel(fPET.Y),1);
         for ind = 1:numel(fPET.Y)
             nr_frames(ind) = numel(fPET.Y(ind).h);

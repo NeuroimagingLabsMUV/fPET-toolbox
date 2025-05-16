@@ -7,7 +7,6 @@
 <meta name="keywords" content="fPET, functional PET, MATLAB toolbox, neuroimaging, molecular connectivity, glucose metabolism, General Linear Model, GLM, Independent Component Analysis, ICA, bolus infusion, PET imaging">
 <meta name="author" content="Andreas Hahn, Murray B. Reed, Rupert Lanzenberger">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="google-site-verification" content="YltUm-VMpDd2HAyCQG2pbuDLvu2kGjuVltmbNuEJx08" />
 -->
 
 A MATLAB toolbox for the analysis of functional PET (fPET) data.

@@ -8,7 +8,7 @@ disp('running ica calculations.')
 % set defaults
 pn = fpet_tlbx_ica_setup(fpetbatch);
 
-% conn
+% ica
 fpet_tlbx_ica_calc(pn);
 
 end

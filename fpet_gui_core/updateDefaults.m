@@ -22,29 +22,34 @@ switch handles.Menu
         fpetbatch.glm.in.mask.calc = handles.Table.Data{5, 2};
         fpetbatch.glm.in.bl_start_fit = handles.Table.Data{6, 2};
     case 3 % Filtering and nuissance regression
-        fpetbatch.glm.in.filter.apply = strcmp(handles.Table.Data{1, 2}, 'true');
-        fpetbatch.glm.in.filter.order = str2num(handles.Table.Data{2, 2});
-        fpetbatch.glm.in.filter.cutoff = str2num(handles.Table.Data{3, 2});
+        fpetbatch.glm.in.fil.apply = strcmp(handles.Table.Data{1, 2}, 'true');
+        fpetbatch.glm.in.fil.order = str2num(handles.Table.Data{2, 2});
+        fpetbatch.glm.in.fil.cutoff = str2num(handles.Table.Data{3, 2});
         fpetbatch.glm.in.regr_motion = handles.Table.Data{4, 2};
         fpetbatch.glm.in.regr_motion_pca = strcmp(handles.Table.Data{5, 2}, 'true');
         fpetbatch.glm.in.regr_add = handles.Table.Data{6, 2};
     case 4 % Task Regressors (if applicable)
-        fpetbatch.glm.in.stim_dur = str2num(handles.Table.Data{1, 2});
+       % fpetbatch.glm.in.stim_dur = str2num(handles.Table.Data{1, 2});
        
-        splt = split(handles.Table.Data(5:end,2), ' - ');
+        splt = split(handles.Table.Data(4:end,2), ' - ');
         if ~isempty(splt)
+            fpetbatch.glm.in.regr = [];
             Rv = cellfun(@(x) str2double(split(regexprep(x, '[^0-9.,]', ''), ',')), splt, 'UniformOutput', false);
             if size(Rv,2) == 1
                 fpetbatch.glm.in.regr(1).start = cell2mat(squeeze(Rv(1)));
                 fpetbatch.glm.in.regr(1).end = cell2mat(squeeze(Rv(2)));
-                fpetbatch.glm.in.regr(1).name = handles.Table.Data{5,1};
+                fpetbatch.glm.in.regr(1).name = handles.Table.Data{4,1};
             else
-                for r = 1 : size(handles.Table.Data(5:end,1),1)
+                for r = 1 : size(handles.Table.Data(4:end,1),1)
                     fpetbatch.glm.in.regr(r).start = cell2mat(squeeze(Rv(r,1,:)))';
                     fpetbatch.glm.in.regr(r).end = cell2mat(squeeze(Rv(r,2,:)))';
-                    fpetbatch.glm.in.regr(r).name = handles.Table.Data{4+r,1};
+                    fpetbatch.glm.in.regr(r).name = handles.Table.Data{3+r,1};
                 end
             end
+        else
+            fpetbatch.glm.in.regr(1).name = '';
+            fpetbatch.glm.in.regr(1).end = [];
+            fpetbatch.glm.in.regr(1).start = [];
         end
     case 5 % Quantification/PSC1
         fpetbatch.run_psc = strcmp(handles.Table.Data{1, 2}, 'true');
@@ -53,7 +58,7 @@ switch handles.Menu
         fpetbatch.quant.in.wb = handles.Table.Data{4, 2};
         fpetbatch.quant.in.plasma = handles.Table.Data{5, 2};
         fpetbatch.quant.in.pwbr = handles.Table.Data{6, 2};
-        fpetbatch.quant.in.parent = str2num(handles.Table.Data{7, 2});
+        fpetbatch.quant.in.parent = handles.Table.Data{7, 2};
         fpetbatch.quant.in.pwbr_fit = convertPlasmaToVal(handles.Table.Data{8, 2});
         fpetbatch.quant.in.lc = str2num(handles.Table.Data{9, 2});
         fpetbatch.quant.in.vb = str2num(handles.Table.Data{10, 2});
@@ -65,13 +70,13 @@ switch handles.Menu
         fpetbatch.glm.in.weight = str2num(handles.Table.Data{3, 2});
         fpetbatch.glm.in.rem_start = str2num(handles.Table.Data{4, 2});
         fpetbatch.glm.in.rem_end = str2num(handles.Table.Data{5, 2});
-        fpetbatch.glm.in.data_incomplete.flag = strcmp(handles.Table.Data{6, 2}, 'true');
+        if ~isempty(handles.Table.Data{6, 2}) fpetbatch.glm.in.data_incomplete.flag = strcmp(handles.Table.Data{6, 2}, 'true'); else fpetbatch.glm.in.data_incomplete.flag = []; end
         fpetbatch.glm.in.data_incomplete.start = str2num(handles.Table.Data{7, 2});
         fpetbatch.glm.in.data_incomplete.end = str2num(handles.Table.Data{8, 2});
     case 7 % TAC Plot
         fpetbatch.run_tacplot = strcmp(handles.Table.Data{1, 2}, 'true');
         fpetbatch.tacplot.in.regr = str2num(handles.Table.Data{2, 2});
-        fpetbatch.tacplot.in.dir = handles.Table.Data{3, 2};
+        fpetbatch.tacplot.in.dir =  handles.Table.Data{3, 2};
         fpetbatch.tacplot.in.mask = handles.Table.Data{4, 2};
         fpetbatch.tacplot.in.indiv = strcmp(handles.Table.Data{5, 2}, 'true');
         fpetbatch.tacplot.in.average = strcmp(handles.Table.Data{6, 2}, 'true');
@@ -82,14 +87,14 @@ switch handles.Menu
         fpetbatch.conn.in.bl_type = convertConnToVal(handles.Table.Data{3, 2});
         fpetbatch.conn.in.bl_start_fit = str2num(handles.Table.Data{4, 2});
         fpetbatch.conn.in.atlas = handles.Table.Data{5, 2};
-        fpetbatch.conn.in.filter.order = str2num(handles.Table.Data{6, 2});
-        fpetbatch.conn.in.filter.cutoff = cellfun(@str2num, split(handles.Table.Data{7, 2}, ' - '))';
-        fpetbatch.conn.in.regr_motion = handles.Table.Data{8, 2};
-        fpetbatch.conn.in.regr_motion_pca = strcmp(handles.Table.Data{9, 2}, 'true');
-        fpetbatch.conn.in.regr_add = handles.Table.Data{10, 2};
-        fpetbatch.conn.in.mask_bl = handles.Table.Data{11, 2};
-        fpetbatch.conn.in.framelength = str2num(handles.Table.Data{12, 2});
-        fpetbatch.conn.in.time = convertNameToVal(handles.Table.Data{13, 2});
+      %  fpetbatch.conn.in.fil.order = str2num(handles.Table.Data{6, 2});
+      %  fpetbatch.conn.in.fil.cutoff = cellfun(@str2num, split(handles.Table.Data{7, 2}, ' - '))';
+        fpetbatch.conn.in.regr_motion = handles.Table.Data{6, 2};
+        fpetbatch.conn.in.regr_motion_pca = strcmp(handles.Table.Data{7, 2}, 'true');
+        fpetbatch.conn.in.regr_add = handles.Table.Data{8, 2};
+        fpetbatch.conn.in.mask_bl = handles.Table.Data{9, 2};
+        fpetbatch.conn.in.framelength = str2num(handles.Table.Data{10, 2});
+        fpetbatch.conn.in.time = convertNameToVal(handles.Table.Data{11, 2});
     case 9 % Advanced Connectivity
         fpetbatch.conn.in.rem_start = str2num(handles.Table.Data{1, 2});
         fpetbatch.conn.in.rem_end = str2num(handles.Table.Data{2, 2});

@@ -5,9 +5,10 @@ function [Y, pn] = fpet_tlbx_glm_setup(fpetbatch);
 
 % load defaults
 fpet_defaults = fpet_tlbx_defaults();
+fPET.v = fpetbatch.v;
 
 % result directory
-if isfield(fpetbatch.dir,'result') && ~isempty(fpetbatch.dir.result)
+if isfield(fpetbatch,'dir') && isfield(fpetbatch.dir,'result') && ~isempty(fpetbatch.dir.result)
     fPET.dir.result = fpetbatch.dir.result;
 else
     fPET.dir.result = pwd;
@@ -35,7 +36,7 @@ else
 end
 
 % check PET data completeness (advanced)
-if isfield(fpetbatch.glm.in,'data_incomplete') && isfield(fpetbatch.glm.in.data_incomplete,'flag') && (fpetbatch.glm.in.data_incomplete.flag == 1)
+if isfield(fpetbatch.glm.in,'data_incomplete') && isfield(fpetbatch.glm.in.data_incomplete,'flag') && ~isempty(fpetbatch.glm.in.data_incomplete.flag) && (fpetbatch.glm.in.data_incomplete.flag == 1)
     fPET.Y.incomplete = 1;
     if fpetbatch.glm.in.time == 1
         fPET.glm.X.incomplete.start = round(fpetbatch.glm.in.data_incomplete.start/fpetbatch.glm.in.framelength);
@@ -190,7 +191,7 @@ if isfield(fpetbatch.glm.in,'regr_motion') && ~isempty(fpetbatch.glm.in.regr_mot
         X.motion.d(end-fPET.glm.X.rem.end+1:end,:) = [];
     end
     % PCA, perform by default, use tradeoff
-    if ~isfield(fpetbatch.glm.in,'regr_motion_pca') || (fpetbatch.glm.in.regr_motion_pca == 1)
+    if ~isfield(fpetbatch.glm.in,'regr_motion_pca') || isempty(fpetbatch.glm.in.regr_motion_pca) || (fpetbatch.glm.in.regr_motion_pca == 1)
         [~, score, ~, ~, exp] = pca(X.motion.d);
         numberOfComponents = findElbow(exp);
         X.motion.d_final = zscore(score(:,1:numberOfComponents));
@@ -230,7 +231,7 @@ end
 clear temp;
 X.bl(isnan(X.bl)) = 0;
 % third order polynomial
-if isfield(fpetbatch.glm.in,'bl_type') && (fpetbatch.glm.in.bl_type == 2)
+if isfield(fpetbatch.glm.in,'bl_type') && ~isempty(fpetbatch.glm.in.bl_type) && (fpetbatch.glm.in.bl_type == 2)
     if fpetbatch.glm.in.time == 1
         bl_start_fit = round(fpetbatch.glm.in.bl_start_fit/fpetbatch.glm.in.framelength);
     elseif fpetbatch.glm.in.time == 2
@@ -246,7 +247,7 @@ end
 fPET.glm.X.bl = X.bl;
 
 % orthogonalization of stimulation regressors
-if (~isfield(fpetbatch.glm.in,'regr_orth') || (fpetbatch.glm.in.regr_orth == 1)) && (~isempty(X.stim.d))
+if (~isfield(fpetbatch.glm.in,'regr_orth') || isempty(fpetbatch.glm.in.regr_orth) || (fpetbatch.glm.in.regr_orth == 1)) && (~isempty(X.stim.d))
     X.stim.d_orth = zeros(size(X.stim.d));
     for ind = 1:nr_regr_stim
         temp = spm_orth([X.bl X.stim.d(:,ind)]);
@@ -279,28 +280,28 @@ for ind = 1:size(X.motion.d_final,2)
 end
 
 % define filter
-if isfield(fpetbatch.glm.in.filter,'apply') && (fpetbatch.glm.in.filter.apply == 1)
-    filter.apply = 1;
-    if ~isfield(fpetbatch.glm.in.filter,'order') || isempty(fpetbatch.glm.in.filter.order)
-        filter.order = fpet_defaults.glm.in.filter.order;
+if (isfield(fpetbatch.glm.in,'fil') && isfield(fpetbatch.glm.in.fil,'apply')) && (isempty(fpetbatch.glm.in.fil.apply) || (fpetbatch.glm.in.fil.apply == 0))
+	fPET.glm.fil.apply = 0;
+else
+    fil.apply = 1;
+    if ~isfield(fpetbatch.glm.in,'fil') || ~isfield(fpetbatch.glm.in.fil,'order') || isempty(fpetbatch.glm.in.fil.order)
+        fil.order = fpet_defaults.glm.in.fil.order;
     else
-        filter.order = round(fpetbatch.glm.in.filter.order/2);
+        fil.order = round(fpetbatch.glm.in.fil.order/2);
     end
-    if ~isfield(fpetbatch.glm.in.filter,'cutoff') || isempty(fpetbatch.glm.in.filter.cutoff)
-        filter.cutoff = 1/(round(mean(X.stim.length(:)))*fpetbatch.glm.in.framelength/2);
+    if ~isfield(fpetbatch.glm.in,'fil') || ~isfield(fpetbatch.glm.in.fil,'cutoff') || isempty(fpetbatch.glm.in.fil.cutoff)
+        fil.cutoff = 1/(round(mean(X.stim.length(:)))*fpetbatch.glm.in.framelength/2);
     else
         if fpetbatch.glm.in.time == 1
-            filter.cutoff = 1/fpetbatch.glm.in.filter.cutoff;
+            fil.cutoff = 1/fpetbatch.glm.in.fil.cutoff;
         elseif fpetbatch.glm.in.time == 2
-            filter.cutoff = 1/(fpetbatch.glm.in.filter.cutoff*fpetbatch.glm.in.framelength);
+            fil.cutoff = 1/(fpetbatch.glm.in.fil.cutoff*fpetbatch.glm.in.framelength);
         end
     end
-    filter.f_nyq = (1/fpetbatch.glm.in.framelength)/2;
-    filter.b = fir1(filter.order, filter.cutoff/filter.f_nyq);
-    filter.a = 1;
-    fPET.glm.filter = filter;
-else
-    fPET.glm.filter.apply = 0;
+    fil.f_nyq = (1/fpetbatch.glm.in.framelength)/2;
+    fil.b = fir1(fil.order, fil.cutoff/fil.f_nyq);
+    fil.a = 1;
+    fPET.glm.fil = fil;
 end
 
 % define weights (Advanced)

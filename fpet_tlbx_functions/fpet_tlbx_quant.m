@@ -8,7 +8,7 @@ disp('running absolute quantification.')
 % set defaults
 pn = fpet_tlbx_quant_setup(fpetbatch);
 
-% psc
+% quant
 fpet_tlbx_quant_calc(pn);
 
 end

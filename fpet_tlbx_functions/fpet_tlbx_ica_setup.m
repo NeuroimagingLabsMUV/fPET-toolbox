@@ -5,9 +5,10 @@ function pn = fpet_tlbx_ica_setup(fpetbatch);
 
 % load defaults
 fpet_defaults = fpet_tlbx_defaults();
+fPET.v = fpetbatch.v;
 
 % result directory
-if isfield(fpetbatch.dir,'result') && ~isempty(fpetbatch.dir.result)
+if isfield(fpetbatch,'dir') && isfield(fpetbatch.dir,'result') && ~isempty(fpetbatch.dir.result)
     fPET.dir.result = fpetbatch.dir.result;
 else
     fPET.dir.result = pwd;

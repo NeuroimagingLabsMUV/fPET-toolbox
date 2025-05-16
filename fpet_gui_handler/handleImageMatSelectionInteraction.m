@@ -2,45 +2,27 @@ function handleImageMatSelectionInteraction(table, selectedRow, selectedColumn, 
 % fPET toolbox: handler function 
 % 
 % Copyright (C) 2024, Neuroimaging Labs, Medical University of Vienna, Austria
-
 switch caseId
     case 1 % single Nifti input
-        [file, path] = uigetfile('*.nii', 'Load Nifti File' , 'MultiSelect', 'off');
-        if file == 0
-            input = '';
-        else
-            input = cellstr(fullfile(path, file));
-        end
+        input = selectFilesFromMultipleFolders('*.nii', 'Load Nifti File', 'off');
+        
     case 2 % single mat or txt input
-        [file, path] = uigetfile({'*.mat;*.xls;*.xlsx;*.txt;'}, 'Load Input File' , 'MultiSelect', 'off');
-        if file == 0
-            input = '';
-        else
-            input = cellstr(fullfile(path, file));
-        end
+        input = selectFilesFromMultipleFolders({'*.txt', 'Input Files'}, 'Load Input File', 'off');
+        
     case 3 % multiple Nifti inputs
-        [file, path] = uigetfile('*.nii', 'Load Nifti Files' , 'MultiSelect', 'on');
-       
-        if ~iscell(file) %size(file,1) <= 1
-            if file == 0
-                input = cellstr('');
-            else
-                input = cellstr(fullfile(path, file));
-            end
-        else
-            input = fullfile(path, file)';
-        end
+        input = selectFilesFromMultipleFolders('*.nii', 'Load Nifti Files', 'on');
+        
     case 4 % single directory input
-        input = cellstr(uigetdir(pwd, 'Select Directory'));
-    case 5 % multiple mat input
-        [file, path] = uigetfile('*.mat', 'Load fPET.mat Files' , 'MultiSelect', 'on');
-        if size(path,1) <= 1
-            input = cellstr(fullfile(path, file));
+        dirPath = uigetdir(pwd, 'Select Directory');
+        if dirPath == 0
+            input = cellstr('');
         else
-            input = cellstr(fullfile(path, file)');
+            input = cellstr(dirPath);
         end
+        
+    case 5 % multiple mat input
+        input = selectFilesFromMultipleFolders('*.mat', 'Load fPET.mat Files', 'on');
 end
-
 
 handles = guidata(table);
 
@@ -50,19 +32,22 @@ else
     tmp = cell2mat(input);
 end
 
-if handles.Menu == 1
+if handles.Menu == 1 && selectedRow == 4
     handles.SavedInputs.T1R4C2 = cell2mat(input); %glm
 end
-if handles.Menu == 2
+if handles.Menu == 2 && selectedRow == 3
     handles.SavedInputs.T2R3C2 = input';
 end
-if handles.Menu == 7
-    handles.SavedInputs.T7R4C2 = input';
+% if handles.Menu == 7 && selectedRow == 4
+%     handles.SavedInputs.T7R4C2 = cell2mat(input);
+% end
+if handles.Menu == 7 && selectedRow == 3
+    handles.SavedInputs.T7R3C2 = input';
 end
-if handles.Menu == 8 && caseId == 1
+if handles.Menu == 8 && caseId == 1 && selectedRow == 2
     handles.SavedInputs.T8R2C2 = cell2mat(input);
 end
-if handles.Menu == 10
+if handles.Menu == 10  && selectedRow == 2
     handles.SavedInputs.T10R2C2 = input';
 end
 if handles.Menu == 11

@@ -7,7 +7,7 @@ function fpetbatch = fpet_tlbx_tacplot_setup(fpetbatch);
 fpet_defaults = fpet_tlbx_defaults();
 
 % glm
-if ~isfield(fpetbatch.tacplot.in,'type') || (fpetbatch.tacplot.in.type == 1)
+if ~isfield(fpetbatch.tacplot.in,'type') || isempty(fpetbatch.tacplot.in.type) || (fpetbatch.tacplot.in.type == 1)
     fpetbatch.tacplot.in.type = 1;
     if ~isfield(fpetbatch.tacplot.in,'indiv') || isempty(fpetbatch.tacplot.in.indiv)
         fpetbatch.tacplot.in.indiv = fpet_defaults.tacplot.in.indiv;

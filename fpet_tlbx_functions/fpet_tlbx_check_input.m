@@ -148,21 +148,21 @@ if batchtype == 1
         end
     end
     
-    if isfield(fpetbatch.glm.in,'bl_type') && (fpetbatch.glm.in.bl_type == 2) 
+    if isfield(fpetbatch.glm.in,'bl_type') && ~isempty(fpetbatch.glm.in.bl_type) && (fpetbatch.glm.in.bl_type == 2) 
         if ~isfield(fpetbatch.glm.in,'bl_start_fit') || isempty(fpetbatch.glm.in.bl_start_fit)
             disp('baseline fit defined as 3rd order polynommial but start time not defined.')
             nr_err_glm = nr_err_glm + 1;
         end
     end
     
-    if isfield(fpetbatch.glm.in.filter,'apply') && (fpetbatch.glm.in.filter.apply ~= 0)
-        if ~any(fpetbatch.glm.in.filter.apply==[1])
-            disp('WARNING: unknown filter type selected, filter will NOT be applied.')
+    if isfield(fpetbatch.glm.in,'fil') && isfield(fpetbatch.glm.in.fil,'apply') && ~isempty(fpetbatch.glm.in.fil.apply) && (fpetbatch.glm.in.fil.apply ~= 0)
+        if ~any(fpetbatch.glm.in.fil.apply==[1])
+            disp('WARNING: unknown filter type selected, default filter will be applied.')
         end
     end
     
     if isfield(fpetbatch.glm.in,'data_incomplete')
-        if isfield(fpetbatch.glm.in.data_incomplete,'flag') && (fpetbatch.glm.in.data_incomplete.flag == 1)
+        if isfield(fpetbatch.glm.in.data_incomplete,'flag') && ~isempty(fpetbatch.glm.in.data_incomplete.flag) && (fpetbatch.glm.in.data_incomplete.flag == 1)
             if ~isfield(fpetbatch.glm.in.data_incomplete,'start') || isempty(fpetbatch.glm.in.data_incomplete.start)
                 disp('data incomplete flag is activated, but no start time provided.')
                 nr_err_glm = nr_err_glm + 1;
@@ -195,7 +195,7 @@ elseif batchtype == 2
     disp('checking input data for calculation of percent signal change.')
     
     % fPET.mat available
-    if ~isfield(fpetbatch.dir,'result')
+    if ~(isfield(fpetbatch,'dir') && isfield(fpetbatch.dir,'result') && ~isempty(fpetbatch.dir.result))
         fpetbatch.dir.result = pwd;
     end
     pnfn = fullfile(fpetbatch.dir.result,'fPET_glm.mat');
@@ -235,7 +235,7 @@ elseif batchtype == 3
     disp('checking input data for quantification.')
     
     % fPET.mat available
-    if ~isfield(fpetbatch.dir,'result')
+    if ~(isfield(fpetbatch,'dir') && isfield(fpetbatch.dir,'result') && ~isempty(fpetbatch.dir.result))
         fpetbatch.dir.result = pwd;
     end
     pnfn = fullfile(fpetbatch.dir.result,'fPET_glm.mat');
@@ -269,22 +269,22 @@ elseif batchtype == 3
     end
 
     % blood data
-    if ~isfield(fpetbatch.quant.in,'wb')
-        if ~isfield(fpetbatch.quant.in,'plasma')
+    if ~isfield(fpetbatch.quant.in,'wb') || isempty(fpetbatch.quant.in.wb)
+        if ~isfield(fpetbatch.quant.in,'plasma') || isempty(fpetbatch.quant.in.plasma)
             disp('whole blood and plasma data not defined.')
             nr_err_quant = nr_err_quant + 1;
         end
-        if ~isfield(fpetbatch.quant.in,'pwbr')
+        if ~isfield(fpetbatch.quant.in,'pwbr') || isempty(fpetbatch.quant.in.pwbr)
             disp('warning: whole blood data and plasma/whole blood ratio not defined, vB is set to 0.')
         end
     else
-        if ~isfield(fpetbatch.quant.in,'plasma') && ~isfield(fpetbatch.quant.in,'pwbr')
+        if (~isfield(fpetbatch.quant.in,'plasma') || isempty(fpetbatch.quant.in.plasma)) && (~isfield(fpetbatch.quant.in,'pwbr') || isempty(fpetbatch.quant.in.pwbr))
             disp('whole blood data provided, but plasma data or plasma/whole blood ratio missing.')
             nr_err_quant = nr_err_quant + 1;
         end
     end
     
-    if ~isfield(fpetbatch.quant.in,'bloodlvl')
+    if ~isfield(fpetbatch.quant.in,'bloodlvl') || isempty(fpetbatch.quant.in.bloodlvl)
         disp('prescan blood level not defined, only net influx constant will be calculated.')
     end
     
@@ -305,7 +305,7 @@ elseif batchtype == 4
     disp('checking input data for plotting tacs.')
     
     % glm
-    if ~isfield(fpetbatch.tacplot.in,'type') || (fpetbatch.tacplot.in.type == 1)
+    if ~isfield(fpetbatch.tacplot.in,'type') || isempty(fpetbatch.tacplot.in.type) || (fpetbatch.tacplot.in.type == 1)
         % fPET.mat available
         if ~isfield(fpetbatch.tacplot.in,'dir') || isempty(fpetbatch.tacplot.in.dir)
             disp('files with fPET glm results not defined.');
@@ -508,7 +508,7 @@ elseif batchtype == 6
         end
     end
     
-    if isfield(fpetbatch.conn.in,'bl_type')
+    if isfield(fpetbatch.conn.in,'bl_type') && ~isempty(fpetbatch.conn.in.bl_type)
         if fpetbatch.conn.in.bl_type == 1 || fpetbatch.conn.in.bl_type == 2
             if ~isfield(fpetbatch.conn.in,'mask_bl') || isempty(fpetbatch.conn.in.mask_bl)
                 disp('mask for baseline definition is not defined.');

@@ -7,7 +7,7 @@ function pn = fpet_tlbx_quant_setup(fpetbatch);
 fpet_defaults = fpet_tlbx_defaults();
 
 % result directory
-if isfield(fpetbatch.dir,'result')
+if isfield(fpetbatch,'dir') && isfield(fpetbatch.dir,'result') && ~isempty(fpetbatch.dir.result)
     pn = fpetbatch.dir.result;
 else
     pn = pwd;
@@ -49,7 +49,9 @@ if isfield(fpetbatch.quant.in,'wb') && ~isempty(fpetbatch.quant.in.wb)
     if fpetbatch.quant.in.time == 2
         B.wb.d(:,1) = B.wb.d(:,1) * 60;
     end
-    B.wb.d = [0 0; B.wb.d];
+    if B.wb.d(1,1) ~= 0
+        B.wb.d = [0 0; B.wb.d];
+    end
     B.wb.d_int = interp1(B.wb.d(:,1),B.wb.d(:,2),x,'linear','extrap');
     B.wb.d_int = B.wb.d_int';
     % complete blood data for incomplete data (advanced)
@@ -64,7 +66,7 @@ end
 
 % plasma data
 if isfield(fpetbatch.quant.in,'plasma') && ~isempty(fpetbatch.quant.in.plasma)
-    B.p.h = fpetbatch.quant.in.p;
+    B.p.h = fpetbatch.quant.in.plasma;
     temp = importdata(B.p.h);
     if isstruct (temp)
         B.p.d = temp.data;
@@ -76,7 +78,9 @@ if isfield(fpetbatch.quant.in,'plasma') && ~isempty(fpetbatch.quant.in.plasma)
     if fpetbatch.quant.in.time == 2
         B.p.d(:,1) = B.p.d(:,1) * 60;
     end
-    B.p.d = [0 0; B.p.d];
+    if B.p.d(1,1) ~= 0
+        B.p.d = [0 0; B.p.d];
+    end
     B.p.d_int = interp1(B.p.d(:,1),B.p.d(:,2),x,'linear','extrap');
     B.p.d_int = B.p.d_int';
     % complete blood data for incomplete data (advanced)

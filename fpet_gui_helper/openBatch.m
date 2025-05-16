@@ -16,7 +16,7 @@ end
 handles = guidata(src);
 handles.SavedInputs.T1R4C2 = fpetbatch.glm.in.data; %glm
 handles.SavedInputs.T2R3C2 = fpetbatch.glm.in.mask.bl_excl;   %glm mask
-handles.SavedInputs.T7R4C2 = fpetbatch.tacplot.in.dir;%TAC
+handles.SavedInputs.T7R3C2 = fpetbatch.tacplot.in.dir; %TAC
 handles.SavedInputs.T8R2C2 = fpetbatch.conn.in.data;%conn
 handles.SavedInputs.T10R2C2 = fpetbatch.cov.in.data; %cov
 handles.SavedInputs.T11R2C2 = fpetbatch.ica.in.data;%ica
