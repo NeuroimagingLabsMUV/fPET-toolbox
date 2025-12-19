@@ -1,0 +1,6 @@
+https://neuroimaginglabsmuv.github.io/fPET-toolbox/
+
+User-agent: *
+Allow: /
+
+Sitemap: https://neuroimaginglabsmuv.github.io/fPET-toolbox/sitemap.xml
