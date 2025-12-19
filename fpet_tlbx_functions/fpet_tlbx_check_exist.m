@@ -170,7 +170,14 @@ if (overwrite_flag == 1) || (isfield(fpetbatch,'overwrite') && (fpetbatch.overwr
     if exist_flag(6) == 1
         pnfn = fullfile(fpetbatch.dir.result, 'fPET_conn.mat');
         load(pnfn);
-        pnfn = fullfile(fPET.dir.result, sprintf('Conn_bl%i.mat', fPET.conn.bl_type));
+		R.name{1} = 'cMC_bl1';
+		R.name{2} = 'cMC_bl2';
+		R.name{3} = 'cMC_bl3';
+		R.name{4} = 'cMC_st';
+		R.name{5} = 'cMC_cc';
+		R.name{6} = 'cMC_bn';
+		R.name{7} = 'eMC';
+        pnfn = fullfile(fPET.dir.result, sprintf('Conn_%s.mat', R.name{fPET.conn.type}));
         delete(pnfn);
     end
     % cov

@@ -96,7 +96,6 @@ fpet_defaults.ica.in.time = [];
 fpet_defaults.ica.in.framelength = [];
 
 
-
 % connectivity
 fpet_defaults.run_conn = 0;
 
@@ -105,8 +104,8 @@ fpet_defaults.conn.in.framelength = [];
 fpet_defaults.conn.in.time = [];
 fpet_defaults.conn.in.atlas = '';
 
+fpet_defaults.conn.in.type = 3;
 fpet_defaults.conn.in.mask_bl = '';
-fpet_defaults.conn.in.bl_type = 3;
 fpet_defaults.conn.in.bl_start_fit = [];
 
 fpet_defaults.conn.in.rem_start = [];
@@ -117,8 +116,14 @@ fpet_defaults.conn.in.regr_motion_incomplete = [];
 fpet_defaults.conn.in.regr_motion_pca = 1;
 
 fpet_defaults.conn.in.regr_add = '';
-% fpet_defaults.conn.in.fil.order = 4;         % half of actual filter order (bec filtfilt is used)
-% fpet_defaults.conn.in.fil.cutoff = [0.01 0.1];   % [Hz]
+fpet_defaults.conn.in.fil.cutoff = [100 10];
+fpet_defaults.conn.in.data_norm = '';
+fpet_defaults.conn.in.mask_wm = '';
+fpet_defaults.conn.in.mask_csf = '';
+fpet_defaults.conn.in.mask_calc = '';
+fpet_defaults.conn.in.nui_t = '';
+fpet_defaults.conn.in.fil.sig_t = 2;
+fpet_defaults.conn.in.fil.sig_s = 1;
 
 
 % covariance
@@ -129,5 +134,10 @@ fpet_defaults.cov.in.atlas = '';
 fpet_defaults.cov.in.mask_norm = '';
 fpet_defaults.cov.in.regr_add = '';
 
+fpet_defaults.cov.in.pca = 0;
+fpet_defaults.cov.in.pc = [];
+fpet_defaults.cov.in.ica = 0;
+fpet_defaults.cov.in.ic = [];
+fpet_defaults.cov.in.jk = 0;
 
 

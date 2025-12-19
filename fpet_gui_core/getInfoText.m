@@ -38,7 +38,7 @@ switch menu
             case 2
                 text = {'Variable: fpetbatch.glm.in.fil.order'; 'Low-pass filter order.'};
             case 3
-                text = {'Variable: fpetbatch.glm.in.fil.cutoff'; 'Cutoff frequency for low-pass filter given in seconds or frames. Use half of task length as default.'};
+                text = {'Variable: fpetbatch.glm.in.fil.cutoff'; 'Cutoff frequency for low-pass filter given in seconds or frames. Default values are given in seconds [100s 10s].  Set as -1 to disable bandpass filter in the CompCor method. Use half of task length as default.'};
             case 4
                 text = {'Variable: fpetbatch.glm.in.regr_motion'; 'Motion nuisance regressors from the SPM realignment step. Input is a .txt or .mat file'};
             case 5
@@ -125,7 +125,7 @@ switch menu
             case 2
                 text = {'Variable: fpetbatch.conn.in.data'; ''; '[Mandatory]'; ''; 'Input file(s) for the connectivity estimation.'};
             case 3
-                text = {'Variable: fpetbatch.conn.in.bl_type'; 'Technique used to remove the tracer baseline uptake. Options: Mask/3rd order polynomial detrending (Global and per ROI).'};
+                text = {'Variable: fpetbatch.conn.in.type'; 'Technique used to remove the tracer baseline uptake. Options: Mask/3rd order polynomial detrending (Global and per ROI).'};
             case 4
                 text = {'Variable: fpetbatch.conn.in.bl_start_fit'; 'Starting point for baseline removal used for both 3rd order polynomial detrending options.'};
             case 5
@@ -141,11 +141,15 @@ switch menu
             case 8
                 text = {'Variable: fpetbatch.conn.in.regr_add'; 'Input of additional nuisance regressors to compute'};
             case 9
-                text = {'Variable: fpetbatch.conn.in.mask_bl'; ''; '[Mandatory]'; ''; 'Mask used to define the baseline, which in turn is used to detrend the input data.'};
+                text = {'Variable: fpetbatch.conn.in.mask_bl'; ''; '[Mandatory for third-order polynomial]'; ''; 'Mask used to define the baseline, which in turn is used to detrend the input data.'};
             case 10
                 text = {'Variable: fpetbatch.conn.in.framelength'; ''; '[Mandatory]'; ''; 'Frame length (TR) of the input data in seconds.'};
             case 11
                 text = {'Variable: fpetbatch.conn.in.time'; '[Mandatory]'; ''; 'Tempral unit of input data. Options: (Frames/Seconds)'};
+            case 12
+                text = {'Variable: fpetbatch.conn.in.mask_wm'; '[Mandatory]'; 'Mask used for white matter nuisance regressor extraction (CompCor filter only)'};
+            case 13
+                text = {'Variable: fpetbatch.conn.in.mask_csf'; '[Mandatory]'; 'Mask used for cerebrospinal fluid nuisance regressor extraction (CompCor filter only)'};
         end
     case 9
         switch row
@@ -155,6 +159,18 @@ switch menu
                 text = {'Variable: fpetbatch.conn.in.rem_end'; 'Remove final frames from metaboolic connectivity estimation.'};
             case 3
                 text = {'Variable: fpetbatch.conn.in.regr_motion_incomplete'; 'Correct incomplete motion nuisance regressors by adding initial or final zeros. Options: At the beginning/end'};
+            case 4
+                text = {'Variable: fpetbatch.conn.in.data_norm'; ''; 'Input file for the extraction of tissue nuisance extraction (CompCor filter only)'};
+            case 5
+                text = {'Variable: fpetbatch.conn.in.nui_t'; ''; 'Tissue nuisance regressor mask threshold (CompCor filter only)'};
+            case 6
+                text = {'Variable: fpetbatch.conn.in.mask_calc'; ''; 'Mask used to constrain connectivity estimation (CompCor filter only)'};
+            case 7
+                text = {'Variable: fpetbatch.conn.in.fil.cutoff'; ''; 'Bandpass cutoff frequencies if required. Inputted in sec or frames. Set to -1 to disable (CompCor filter only)'};
+            case 8
+                text = {'Variable: fpetbatch.conn.in.fil.sig_t'; ''; 'Temporal sigma value for spatio-temporal filter'};
+            case 9
+                text = {'Variable: fpetbatch.conn.in.fil.sig_s' ''; 'Spatial sigma value for spatio-temporal filter'};
         end
     case 10
         switch row
@@ -168,6 +184,16 @@ switch menu
                 text = {'Variable: fpetbatch.cov.in.mask_norm'; ''; '[Mandatory]'; ''; 'Mask to normalize the data. Usually a gray matter mask'};
             case 5
                 text = {'Variable: fpetbatch.cov.in.regr_add'; ''; 'Input of additional nuisance regressors to compute'};
+            case 6
+                text = {'Variable: fpetbatch.cov.in.jk'; ''; 'Run Jackknife leave-one-out covariance estimation'};
+            case 7
+                text = {'Variable: fpetbatch.cov.in.pca'; ''; 'Run PCA decomposition of covariance'};
+            case 8
+                text = {'Variable: fpetbatch.cov.in.pc'; ''; 'Number of principle components to be estimtated'};
+            case 9
+                text = {'Variable: fpetbatch.cov.in.ica'; ''; 'Run ICA decomposition of covariance'};
+            case 10 
+                text = {'Variable: fpetbatch.cov.in.ic'; ''; 'Number of independent components to be estimtated'};
         end
     case 11
         switch row

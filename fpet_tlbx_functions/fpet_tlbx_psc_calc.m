@@ -7,6 +7,15 @@ load(fullfile(pn,'fPET_glm.mat'));
 
 % baseline
 X.bl = fPET.glm.X.bl;
+% probabilistic
+if fPET.glm.X.bl_prob
+    temp = which('fpet_tlbx_run');
+    M.bl_prob.h = spm_vol(fullfile(temp(1:end-16),'fpet_data','prob','FDG_human_KPM.nii'));
+    M.bl_prob.d = spm_read_vols(M.bl_prob.h);
+    M.bl_prob.d(isinf(M.bl_prob.d)) = 0;
+    M.bl_prob.d(isnan(M.bl_prob.d)) = 0;
+    M.bl_prob.d_re = reshape(M.bl_prob.d, numel(M.bl_prob.d(:,:,:,1)), size(M.bl_prob.d,4));
+end
 
 % beta baseline
 B.bl.h = spm_vol('b2_baseline.nii');
@@ -24,8 +33,13 @@ for ind_s = 1:size(fPET.glm.X.stim.d,2)
     % compute percent signal change
     R.stim.d_re = zeros(size(B.bl.d_re));
     for ind_v = 1:size(B.bl.d_re,1)
-        if (B.bl.d_re(ind_v))    
-            X.bl_temp = X.bl * B.bl.d_re(ind_v);
+        if (B.bl.d_re(ind_v))
+            if fPET.glm.X.bl_prob
+                bl_temp = sum(X.bl.*M.bl_prob.d_re(ind_v,:),2);
+                X.bl_temp = bl_temp * B.bl.d_re(ind_v);
+            else
+                X.bl_temp = X.bl * B.bl.d_re(ind_v);
+            end
 
             % first order polynomial from 1/3 of scan
             % scale x in units of minutes, i.e. slope in kBq/min (matching task regressor)

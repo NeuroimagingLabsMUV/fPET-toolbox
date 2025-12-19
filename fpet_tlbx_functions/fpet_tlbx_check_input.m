@@ -4,6 +4,7 @@ function error_flag = fpet_tlbx_check_input(fpetbatch, batchtype);
 % Copyright (C) 2024, Neuroimaging Labs, Medical University of Vienna, Austria
 
 error_flag = 0;
+fpet_defaults = fpet_tlbx_defaults();
 
 % glm
 if batchtype == 1
@@ -89,7 +90,7 @@ if batchtype == 1
         end
     end
     
-    if isfield(fpetbatch.glm.in.mask,'bl_excl') && ~isempty(fpetbatch.glm.in.mask.bl_excl)
+    if isfield(fpetbatch.glm.in.mask,'bl_excl') && ~isempty(fpetbatch.glm.in.mask.bl_excl) && ~isempty(fpetbatch.glm.in.mask.bl_excl{1})
         nr_m_blex = numel(fpetbatch.glm.in.mask.bl_excl);
         for ind = 1:nr_m_blex
             M.blex.h = spm_vol(fpetbatch.glm.in.mask.bl_excl{ind});
@@ -134,7 +135,7 @@ if batchtype == 1
             fprintf('additional regressors are not a 2D matrix.')
             nr_err_glm = nr_err_glm + 1;
         else
-            if ~((size(X.add.d,1) == Y.h.dim(4)) || (size(X.add.d,2) == Y.h.dim(4)))
+            if ~((size(X.add.d,1) == numel(Y.h)) || (size(X.add.d,2) == numel(Y.h)))
                 fprintf('temporal dimension of additional regressors does not match input data.')
                 nr_err_glm = nr_err_glm + 1;
             end
@@ -148,7 +149,7 @@ if batchtype == 1
         end
     end
     
-    if isfield(fpetbatch.glm.in,'bl_type') && ~isempty(fpetbatch.glm.in.bl_type) && (fpetbatch.glm.in.bl_type == 2) 
+    if isfield(fpetbatch.glm.in,'type') && ~isempty(fpetbatch.glm.in.type) && (fpetbatch.glm.in.type == 2) 
         if ~isfield(fpetbatch.glm.in,'bl_start_fit') || isempty(fpetbatch.glm.in.bl_start_fit)
             disp('baseline fit defined as 3rd order polynommial but start time not defined.')
             nr_err_glm = nr_err_glm + 1;
@@ -501,33 +502,64 @@ elseif batchtype == 6
             fprintf('additional regressors are not a 2D matrix.')
             nr_err_conn = nr_err_conn + 1;
         else
-            if ~((size(X.add.d,1) == Y.h.dim(4)) || (size(X.add.d,2) == Y.h.dim(4)))
+            if ~((size(X.add.d,1) == numel(Y.h)) || (size(X.add.d,2) == numel(Y.h)))
                 fprintf('temporal dimension of additional regressors does not match input data.')
                 nr_err_conn = nr_err_conn + 1;
             end
         end
     end
     
-    if isfield(fpetbatch.conn.in,'bl_type') && ~isempty(fpetbatch.conn.in.bl_type)
-        if fpetbatch.conn.in.bl_type == 1 || fpetbatch.conn.in.bl_type == 2
-            if ~isfield(fpetbatch.conn.in,'mask_bl') || isempty(fpetbatch.conn.in.mask_bl)
-                disp('mask for baseline definition is not defined.');
-                nr_err_conn = nr_err_conn + 1;
-            else
-                M.bl.h = spm_vol(fpetbatch.conn.in.mask_bl);
-                if ~isequal(Y.h(1).dim(1:3), M.bl.h.dim)
-                    disp('spatial dimensions of baseline mask do not match input data.');
-                    nr_err_conn = nr_err_conn + 1;
-                end
-            end
-        end
-        if fpetbatch.conn.in.bl_type == 2 || fpetbatch.conn.in.bl_type == 3
-            if ~isfield(fpetbatch.conn.in,'bl_start_fit') || isempty(fpetbatch.conn.in.bl_start_fit)
-                disp('baseline fit defined as 3rd order polynommial but start time not defined.')
-                nr_err_conn = nr_err_conn + 1;
-            end
-        end
+    if ~isfield(fpetbatch.conn.in,'type') || isempty(fpetbatch.conn.in.type)
+		fpetbatch.conn.in.type = fpet_defaults.conn.in.type;
     end
+    
+	if fpetbatch.conn.in.type == 1 || fpetbatch.conn.in.type == 2
+		if ~isfield(fpetbatch.conn.in,'mask_bl') || isempty(fpetbatch.conn.in.mask_bl)
+			disp('mask for baseline definition is not defined.');
+			nr_err_conn = nr_err_conn + 1;
+		else
+			M.bl.h = spm_vol(fpetbatch.conn.in.mask_bl);
+			if ~isequal(Y.h(1).dim(1:3), M.bl.h.dim)
+				disp('spatial dimensions of baseline mask do not match input data.');
+				nr_err_conn = nr_err_conn + 1;
+			end
+		end
+	end
+	if fpetbatch.conn.in.type == 2 || fpetbatch.conn.in.type == 3
+		if ~isfield(fpetbatch.conn.in,'bl_start_fit') || isempty(fpetbatch.conn.in.bl_start_fit)
+			disp('baseline fit defined as 3rd order polynommial but start time not defined.')
+			nr_err_conn = nr_err_conn + 1;
+		end
+	end
+	if fpetbatch.conn.in.type == 5
+		if ~isfield(fpetbatch.conn.in,'mask_wm') || isempty(fpetbatch.conn.in.mask_wm)
+			disp('mask for white matter is not defined.');
+			nr_err_conn = nr_err_conn + 1;
+		else
+			M.wm.h = spm_vol(fpetbatch.conn.in.mask_wm);
+			if ~isequal(Y.h(1).dim(1:3), M.wm.h.dim)
+				disp('spatial dimensions of white matter mask do not match input data.');
+				nr_err_conn = nr_err_conn + 1;
+			end
+		end
+		if ~isfield(fpetbatch.conn.in,'mask_csf') || isempty(fpetbatch.conn.in.mask_csf)
+			disp('mask for csf is not defined.');
+			nr_err_conn = nr_err_conn + 1;
+		else
+			M.csf.h = spm_vol(fpetbatch.conn.in.mask_csf);
+			if ~isequal(Y.h(1).dim(1:3), M.csf.h.dim)
+				disp('spatial dimensions of csf mask do not match input data.');
+				nr_err_conn = nr_err_conn + 1;
+			end
+		end
+		if isfield(fpetbatch.conn.in,'mask_calc') && ~isempty(fpetbatch.conn.in.mask_calc)
+			M.calc.h = spm_vol(fpetbatch.conn.in.mask_calc);
+			if ~isequal(Y.h(1).dim(1:3), M.calc.h.dim)
+				disp('spatial dimensions of calculation mask do not match input data.');
+				nr_err_conn = nr_err_conn + 1;
+			end
+		end
+	end
     
     if nr_err_conn > 0
         disp('*****')

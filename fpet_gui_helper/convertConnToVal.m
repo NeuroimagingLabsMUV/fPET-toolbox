@@ -8,10 +8,14 @@ function value = convertConnToVal(name)
         value = 2;
     elseif strcmp(name, '3rd Order Polynomial Detrending (per ROI)')
         value = 3;
-%     elseif strcmp(name, 'Spatio-temporal Filter')
-%         value = 4;
-%     elseif strcmp(name, 'Bandpass Filter')
-%         value = 5;
+     elseif strcmp(name, 'Spatio-temporal Filter')
+         value = 4;
+     elseif strcmp(name, 'CompCor Filter')
+         value = 5;
+    elseif strcmp(name, 'Baseline normalization') 
+         value = 6;
+     elseif strcmp(name, 'Euclidean distance') 
+         value = 7;
     else
         value = str2double(name); 
     end

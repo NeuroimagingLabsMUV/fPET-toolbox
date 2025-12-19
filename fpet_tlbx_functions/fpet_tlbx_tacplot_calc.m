@@ -16,10 +16,19 @@ if fpetbatch.tacplot.in.type == 1
     M.plot.d(M.plot.d~=0) = 1;
 
     for ind = 1:nr_subj
+        % load data
         load(fpetbatch.tacplot.in.dir{ind});
         Y.d = spm_read_vols(fPET.Y.h);
         Y.d(isinf(Y.d)) = NaN;
-
+        % probabilistic bl
+        if fPET.glm.X.bl_prob
+            temp = which('fpet_tlbx_run');
+            M.bl_prob.h = spm_vol(fullfile(temp(1:end-16),'fpet_data','prob','FDG_human_KPM.nii'));
+            M.bl_prob.d = spm_read_vols(M.bl_prob.h);
+            M.bl_prob.d(isinf(M.bl_prob.d)) = 0;
+            M.bl_prob.d(isnan(M.bl_prob.d)) = 0;
+        end
+        
         % extract tac
         tac_temp = zeros(size(Y.d,4),1);
         for ind2 = 1:size(Y.d,4)
@@ -31,17 +40,67 @@ if fpetbatch.tacplot.in.type == 1
         if any(tac_temp)
             % apply filter
             if fPET.glm.fil.apply == 1
-                tac_temp = filtfilt(fPET.glm.fil.b, fPET.glm.fil.a, tac_temp);
+                if fPET.Y.incomplete == 1
+                    % temporarily interpolate missing data for proper filter function
+                    tvec_temp = fPET.tvec;
+                    if (fPET.glm.X.incomplete.start(1) ~= 1) && (tvec_temp(1) == 0)
+                        tvec_temp(1) = [];
+                    end
+                    ind_miss = find(diff(tvec_temp)>(fPET.framelength*1.5));
+                    clear x_orig tac_orig ind_temp y_temp;
+                    x_orig{1} = tvec_temp(1:ind_miss(1));
+                    tac_orig{1} = tac_temp(1:ind_miss(1));
+                    for ind2 = 1:numel(ind_miss)-1
+                        x_orig{ind2+1} = tvec_temp(ind_miss(ind2)+1:ind_miss(ind2+1));
+                        tac_orig{ind2+1} = tac_temp(ind_miss(ind2)+1:ind_miss(ind2+1));
+                    end
+                    x_orig{ind2+2} = tvec_temp(ind_miss(end)+1:end);
+                    tac_orig{ind2+2} = tac_temp(ind_miss(end)+1:end);
+                    n_add = 0;
+                    for ind2 = 1:numel(ind_miss)
+                        x_temp = tvec_temp(ind_miss(ind2))+fPET.framelength:fPET.framelength:tvec_temp(ind_miss(ind2)+1);
+                        if x_temp(end) == x_orig{ind2+1}(1)
+                            x_temp(end) = [];
+                        end
+                        ind_temp{ind2} = (ind_miss(ind2)+1:ind_miss(ind2)+numel(x_temp)) + n_add;
+                        n_add = n_add + numel(ind_temp{ind2});
+                        y_temp{ind2} = interp1(tvec_temp(ind_miss(ind2):ind_miss(ind2)+1), tac_temp(ind_miss(ind2):ind_miss(ind2)+1), x_temp);
+                    end
+                    tac_temp = [];
+                    for ind2 = 1:numel(ind_miss)
+                        tac_temp = [tac_temp tac_orig{ind2}' y_temp{ind2}];
+                    end
+                    tac_temp = [tac_temp tac_orig{ind2+1}'];
+                    tac_temp = filtfilt(fPET.glm.fil.b, fPET.glm.fil.a, tac_temp);
+                    tac_temp(cell2mat(ind_temp)) = [];
+                else
+                    tac_temp = filtfilt(fPET.glm.fil.b, fPET.glm.fil.a, tac_temp);
+                end
             end
             % adding anchor point for incommplete data (advanced)
-            if (fPET.Y.incomplete == 1) && (fPET.glm.X.incomplete.start(1) ~= 1)
+            if size(tac_temp,2) > size(tac_temp,1)
+                tac_temp = tac_temp';
+            end
+            if (fPET.Y.incomplete == 1) && (fPET.glm.X.incomplete.start(1) ~= 1)  && (fPET.glm.X.incomplete.no_anchor == 0)
                 tac_temp = [0; tac_temp];
             end
             % glm
-            X_all = [fPET.glm.X.bl fPET.glm.X.stim.d fPET.glm.X.add.d fPET.glm.X.motion.d_final];
+            if fPET.glm.X.bl_prob
+                % probabilistic baseline
+                prob_temp = zeros(1,size(M.bl_prob.d,4));
+                for ind_prob = 1:size(M.bl_prob.d,4)
+                    temp = M.bl_prob.d(:,:,:,ind_prob);
+                    prob_temp(1,ind_prob) = nanmean(temp(M.plot.d==1));
+                end
+                bl_temp = sum(fPET.glm.X.bl.*prob_temp,2);
+                X_all = [bl_temp fPET.glm.X.stim.d fPET.glm.X.add.d fPET.glm.X.motion.d_final];
+            else
+                X_all = [fPET.glm.X.bl fPET.glm.X.stim.d fPET.glm.X.add.d fPET.glm.X.motion.d_final];
+            end
             b = glmfit(X_all, tac_temp, '', 'weights',fPET.glm.weight);
             regr = fpetbatch.tacplot.in.regr - 1;
             tac.raw.d(ind,:) = tac_temp;
+            tac.resid.d(ind,:) = tac_temp - b(1) - sum(X_all.*(b(2:end))',2);
             for ind2 = 1:numel(regr)
                 % remove regressors of non-interest
                 tac_temp = tac.raw.d(ind,:);
@@ -52,7 +111,27 @@ if fpetbatch.tacplot.in.type == 1
                 X_temp(:,regr(ind2)) = [];
                 b_temp(regr(ind2)) = [];
                 tac.spec(ind2).d(ind,:) = tac_temp' - b(1) - sum(X_temp.*b_temp',2);
-                tac.spec(ind2).name = fPET.glm.X.name{regr(ind2)+1};
+                tac.spec(ind2).name = sprintf('b%i_%s', regr(ind2)+1, fPET.glm.X.name{regr(ind2)+1});
+            end
+            % save tacs
+            if isfield(fpetbatch.tacplot.in,'save_result') && ~isempty(fpetbatch.tacplot.in.save_result) && (fpetbatch.tacplot.in.save_result == 1)
+                if isfield(fpetbatch.tacplot.in,'overwrite') && ~isempty(fpetbatch.tacplot.in.overwrite)
+                    pn = sprintf('%sfPET_tacplot_%03i.mat', fpetbatch.tacplot.in.dir{ind}(1:end-12), fpetbatch.tacplot.in.overwrite);
+                else
+                    pn = sprintf('%sfPET_tacplot_*.mat', fpetbatch.tacplot.in.dir{ind}(1:end-12));
+                    fn = dir(pn);
+                    pn = sprintf('%sfPET_tacplot_%03i.mat', fpetbatch.tacplot.in.dir{ind}(1:end-12), numel(fn)+1);
+                end
+                tac_raw = tac.raw.d(ind,:);
+                tac_resid = tac.resid.d(ind,:);
+                for ind2 = 1:numel(regr)
+                    tac_spec.(tac.spec(ind2).name).data = tac.spec(ind2).d(ind,:);
+                    tac_spec.(tac.spec(ind2).name).regr = tac.spec(ind2).X(ind,:);
+                    tac_spec.(tac.spec(ind2).name).beta = tac.spec(ind2).b(ind);
+                end
+                tvec = fPET.tvec;
+                mask_name = fpetbatch.tacplot.in.mask;
+                save(pn, 'tac_raw', 'tac_spec', 'tac_resid', 'tvec', 'mask_name');
             end
         else
             error('no data found within mask.');
@@ -77,7 +156,7 @@ if fpetbatch.tacplot.in.type == 1
             end
         end
     end
-
+    
     % plotting average tac
     if (fpetbatch.tacplot.in.average == 1) && (nr_subj > 1)
         % raw tac

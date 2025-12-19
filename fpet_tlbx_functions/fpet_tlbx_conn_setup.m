@@ -1,6 +1,6 @@
-function [Y, pn] = fpet_tlbx_conn_setup(fpetbatch);
+function [Y, pn] = fpet_tlbx_conn_setup(fpetbatch)
 % fPET toolbox: set default values for connectivity
-% 
+%
 % Copyright (C) 2024, Neuroimaging Labs, Medical University of Vienna, Austria
 
 % load defaults
@@ -107,14 +107,14 @@ else
 end
 fPET.conn.X.add = X.add;
 
-% baseline removal
-if ~isfield(fpetbatch.conn.in,'bl_type') || isempty(fpetbatch.conn.in.bl_type)
-    fpetbatch.conn.in.bl_type = fpet_defaults.conn.in.bl_type;
+% connectivity type
+if ~isfield(fpetbatch.conn.in,'type') || isempty(fpetbatch.conn.in.type)
+    fpetbatch.conn.in.type = fpet_defaults.conn.in.type;
 end
 
 % average tac +/- 3rd order polynomial fitting
 fPET.conn.X.bl = [];
-if fpetbatch.conn.in.bl_type == 1 || fpetbatch.conn.in.bl_type == 2
+if fpetbatch.conn.in.type == 1 || fpetbatch.conn.in.type == 2
     % mask for baseline definition
     M.bl.h = spm_vol(fpetbatch.conn.in.mask_bl);
     M.bl.d = spm_read_vols(M.bl.h);
@@ -134,7 +134,7 @@ if fpetbatch.conn.in.bl_type == 1 || fpetbatch.conn.in.bl_type == 2
     
     % mask fitted with third order polynomial
     % data before fit is removed
-    if fpetbatch.conn.in.bl_type == 2
+    if fpetbatch.conn.in.type == 2
         if fpetbatch.conn.in.time == 1
             bl_start_fit = round(fpetbatch.conn.in.bl_start_fit/fpetbatch.conn.in.framelength);
         elseif fpetbatch.conn.in.time == 2
@@ -149,10 +149,10 @@ if fpetbatch.conn.in.bl_type == 1 || fpetbatch.conn.in.bl_type == 2
         X.bl = b(1) + b(2)*x + b(3)*(x.^2) + b(4)*(x.^3);
     end
     fPET.conn.X.bl = X.bl;
-
+    
 % each ROI separately fitted with 3rd order polynomial fitting
 % data before fit is removed
-elseif fpetbatch.conn.in.bl_type == 3
+elseif fpetbatch.conn.in.type == 3
     if fpetbatch.conn.in.time == 1
         bl_start_fit = round(fpetbatch.conn.in.bl_start_fit/fpetbatch.conn.in.framelength);
     elseif fpetbatch.conn.in.time == 2
@@ -164,37 +164,71 @@ elseif fpetbatch.conn.in.bl_type == 3
     fPET.conn.X.add.d = fPET.conn.X.add.d(bl_start_fit:end,:);
     fPET.tvec = fPET.tvec(bl_start_fit:end);
     fPET.conn.X.start_fit = bl_start_fit;
-
+    
 % spatio-temporal filter (Monash)
-elseif fpetbatch.conn.in.bl_type == 4
-    % not yet implemented
-
-% bandpass filter
-elseif fpetbatch.conn.in.bl_type == 5
-    % NOT yet fully tested, use at own risk
-    if ~isfield(fpetbatch.conn.in.fil,'order') || isempty(fpetbatch.conn.in.fil.order)
-        fil.order = fpet_defaults.conn.in.fil.order;
+elseif fpetbatch.conn.in.type == 4
+	if ~isfield(fpetbatch.conn.in,'sig_t') || isempty(fpetbatch.conn.in.sig_t)
+        fPET.conn.fil.sig_t = fpet_defaults.conn.in.fil.sig_t;
     else
-        fil.order = round(fpetbatch.conn.in.fil.order/2);
+        fPET.conn.fil.sig_t = fpetbatch.conn.fil.sig_t;
     end
+	if ~isfield(fpetbatch.conn.in,'sig_s') || isempty(fpetbatch.conn.in.sig_s)
+        fPET.conn.fil.sig_s = fpet_defaults.conn.in.fil.sig_s;
+    else
+        fPET.conn.M.sig_s = fpetbatch.conn.in.sig_s;
+    end
+    
+% CompCor filter
+elseif fpetbatch.conn.in.type == 5
+    if ~isfield(fpetbatch.conn.in,'data_norm') || isempty(fpetbatch.conn.in.data_norm)
+        Y.Y_norm = Y;
+        fPET.Y.Ynorm.h = Y.h;
+        fPET.Y.Ynorm.dir = Y.dir;
+    else
+        Y.Y_norm = fpet_tlbx_load4d(fpetbatch.conn.in.data_norm, fPET.conn.X.rem.start, fPET.conn.X.rem.end);
+        fPET.Y.Ynorm.h = Y.Y_norm.h;
+        fPET.Y.Ynorm.dir = Y.Y_norm.dir;
+    end
+    Y.Y_norm.d_re = reshape(Y.Y_norm.d, size(Y.Y_norm.d, 1) * size(Y.Y_norm.d, 2) * size(Y.Y_norm.d, 3), size(Y.Y_norm.d, 4))';
+    fPET.conn.M.wm.h = spm_vol(fpetbatch.conn.in.mask_wm);
+    fPET.conn.M.wm.d = spm_read_vols(fPET.conn.M.wm.h);
+    fPET.conn.M.wm.d(isinf(fPET.conn.M.wm.d)) = 0;
+    fPET.conn.M.wm.d(isnan(fPET.conn.M.wm.d)) = 0;
+    
+    fPET.conn.M.csf.h = spm_vol(fpetbatch.conn.in.mask_csf);
+    fPET.conn.M.csf.d = spm_read_vols(fPET.conn.M.csf.h);
+    fPET.conn.M.csf.d(isinf(fPET.conn.M.csf.d)) = 0;
+    fPET.conn.M.csf.d(isnan(fPET.conn.M.csf.d)) = 0;
+    
+    if ~isfield(fpetbatch.conn.in,'nui_t') || isempty(fpetbatch.conn.in.nui_t)
+        fPET.conn.M.nui_t = -1;
+    else
+        fPET.conn.M.nui_t = fpetbatch.conn.in.nui_t;
+    end
+    if ~isfield(fpetbatch.conn.in,'mask_calc') || isempty(fpetbatch.conn.in.mask_calc)
+        fPET.conn.M.calc_mask.d = ones(size(Y.d,1:3));
+    else
+        fPET.conn.M.mask_calc.h = spm_vol(fpetbatch.conn.in.mask_calc);
+        fPET.conn.M.mask_calc.d = spm_read_vols(fPET.conn.M.mask_calc.h);
+        fPET.conn.M.mask_calc.d(isinf(fPET.conn.M.mask_calc.d)) = 0;
+        fPET.conn.M.mask_calc.d(isnan(fPET.conn.M.mask_calc.d)) = 0;
+        fPET.conn.M.mask_calc.d_re = fPET.conn.M.mask_calc.d(:) ~= 0;
+    end
+    
     if ~isfield(fpetbatch.conn.in.fil,'cutoff') || isempty(fpetbatch.conn.in.fil.cutoff)
-        fil.cutoff = fpet_defaults.conn.in.fil.cutoff;
+        fPET.conn.fil.cutoff = -1;
     else
         if fpetbatch.conn.in.time == 1
-            fil.cutoff = 1/fpetbatch.conn.in.fil.cutoff;
+            fPET.conn.fil.cutoff = 1./fpetbatch.conn.in.fil.cutoff;
         elseif fpetbatch.conn.in.time == 2
-            fil.cutoff = 1/(fpetbatch.conn.in.fil.cutoff*fpetbatch.conn.in.framelength);
+            fPET.conn.fil.cutoff = 1./(fpetbatch.conn.in.fil.cutoff*fpetbatch.conn.in.framelength);
+        end
+        if any(fPET.conn.fil.cutoff / (1/fpetbatch.conn.in.framelength/2) >= 1)
+            disp('WARNING: Filter band exceeds normalized Nyquist frequency: please redesign your bandpass for accurate connectivity estimation');
         end
     end
-    fil.f_nyq = (1/fpetbatch.conn.in.framelength)/2;
-    [fil.b, fil.a] = butter(fil.order, fil.cutoff/fil.f_nyq, 'bandpass');
-    fPET.conn.fil = fil;
-    
 end
-fPET.conn.bl_type = fpetbatch.conn.in.bl_type;
-
-
-
+fPET.conn.type = fpetbatch.conn.in.type;
 % save values
 save(fullfile(fPET.dir.result, 'fPET_conn.mat'), 'fPET');
 pn = fPET.dir.result;
@@ -202,14 +236,12 @@ pn = fPET.dir.result;
 end
 
 
-
-
-% % % % % 
+% % % % %
 function [ei] = findElbow(y)
 y = y(:);
 % scale x-axis to max 1
 x  = linspace(0, 1, numel(y))';
- % scale y-axis to max 1
+% scale y-axis to max 1
 y = y / max(y);
 % calculate distance from origin
 d  = sqrt(y .^ 2 + x .^ 2);

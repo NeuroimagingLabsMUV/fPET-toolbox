@@ -6,10 +6,10 @@ function fpet_tlbx_glm(fpetbatch);
 disp('running glm calculations.')
 
 % set defaults
-[Y, pn] = fpet_tlbx_glm_setup(fpetbatch);
+[Y, fpet_param] = fpet_tlbx_glm_setup(fpetbatch);
 
 % glm
-fpet_tlbx_glm_calc(Y, pn);
+fpet_tlbx_glm_calc(Y, fpet_param);
 
 end
 

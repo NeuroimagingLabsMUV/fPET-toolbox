@@ -1,6 +1,6 @@
-function pn = fpet_tlbx_cov_setup(fpetbatch);
+function pn = fpet_tlbx_cov_setup(fpetbatch)
 % fPET toolbox: set default values for covariance
-% 
+%
 % Copyright (C) 2024, Neuroimaging Labs, Medical University of Vienna, Austria
 
 fPET.v = fpetbatch.v;
@@ -50,6 +50,49 @@ else
     X.add.d = [];
 end
 fPET.cov.X.add = X.add;
+
+% additional estimation of cov parameters via ica
+if isfield(fpetbatch.cov.in,'ica') && ~isempty(fpetbatch.cov.in.ica)
+    if fpetbatch.cov.in.ica ~= 0
+        fPET.cov.in.ica = true;
+        if isfield(fpetbatch.cov.in,'ic') && ~isempty(fpetbatch.cov.in.ic)
+            fPET.cov.in.ic = fpetbatch.cov.in.ic;
+        else
+            fPET.cov.in.ic = [];
+        end
+    else
+        fPET.cov.in.ica = false;
+    end
+else
+    fPET.cov.in.ica = false;
+end
+
+% additional estimation of cov parameters via pca
+if isfield(fpetbatch.cov.in,'pca') && ~isempty(fpetbatch.cov.in.pca)
+    if fpetbatch.cov.in.pca ~= 0
+        fPET.cov.in.pca = true;
+        if isfield(fpetbatch.cov.in,'pc') && ~isempty(fpetbatch.cov.in.pc)
+            fPET.cov.in.pc = fpetbatch.cov.in.pc;
+        else
+            fPET.cov.in.pc = [];
+        end
+    else
+        fPET.cov.in.pca = false;
+    end
+else
+    fPET.cov.in.pca = false;
+end
+
+% additional estimation of cov parameters via jackknife loo
+if isfield(fpetbatch.cov.in,'jk') && ~isempty(fpetbatch.cov.in.jk)
+    if fpetbatch.cov.in.jk ~= 0
+        fPET.cov.in.jk = true;
+    else
+        fPET.cov.in.jk = false;
+    end
+else
+    fPET.cov.in.jk = false;
+end
 
 % save values
 save(fullfile(fPET.dir.result, 'fPET_cov.mat'), 'fPET');

@@ -84,7 +84,7 @@ switch handles.Menu
     case 8 % Connectivity
         fpetbatch.run_conn = strcmp(handles.Table.Data{1, 2}, 'true');
         fpetbatch.conn.in.data = handles.Table.Data{2, 2};
-        fpetbatch.conn.in.bl_type = convertConnToVal(handles.Table.Data{3, 2});
+        fpetbatch.conn.in.type = convertConnToVal(handles.Table.Data{3, 2});
         fpetbatch.conn.in.bl_start_fit = str2num(handles.Table.Data{4, 2});
         fpetbatch.conn.in.atlas = handles.Table.Data{5, 2};
       %  fpetbatch.conn.in.fil.order = str2num(handles.Table.Data{6, 2});
@@ -95,16 +95,29 @@ switch handles.Menu
         fpetbatch.conn.in.mask_bl = handles.Table.Data{9, 2};
         fpetbatch.conn.in.framelength = str2num(handles.Table.Data{10, 2});
         fpetbatch.conn.in.time = convertNameToVal(handles.Table.Data{11, 2});
+        fpetbatch.conn.in.mask_wm = handles.Table.Data{12,2};
+        fpetbatch.conn.in.mask_csf = handles.Table.Data{13,2};
     case 9 % Advanced Connectivity
         fpetbatch.conn.in.rem_start = str2num(handles.Table.Data{1, 2});
         fpetbatch.conn.in.rem_end = str2num(handles.Table.Data{2, 2});
         fpetbatch.conn.in.regr_motion_incomplete = convertPadToVal(handles.Table.Data{3, 2});
+        fpetbatch.conn.in.data_norm = handles.Table.Data{4,2};
+        fpetbatch.conn.in.nui_t = str2num(handles.Table.Data{5,2});
+        fpetbatch.conn.in.mask_calc = handles.Table.Data{6,2};
+        fpetbatch.conn.in.fil.cutoff = cellfun(@str2num, split(handles.Table.Data{7, 2}, ' - '))';
+        fpetbatch.conn.in.fil.sigma_t = str2num(handles.Table.Data{8,2});
+        fpetbatch.conn.in.fil.sigma_s = str2num(handles.Table.Data{9,2});
     case 10 % Covariance
         fpetbatch.run_cov = strcmp(handles.Table.Data{1, 2}, 'true');
         fpetbatch.cov.in.data = handles.Table.Data{2, 2};
         fpetbatch.cov.in.atlas = handles.Table.Data{3, 2};
         fpetbatch.cov.in.mask_norm = handles.Table.Data{4, 2};
         fpetbatch.cov.in.regr_add = handles.Table.Data{5, 2};
+        fpetbatch.cov.in.jk = handles.Table.Data{6, 2};
+        fpetbatch.cov.in.pca = handles.Table.Data{7, 2};
+        fpetbatch.cov.in.pc = str2num(handles.Table.Data{8, 2});
+        fpetbatch.cov.in.ica = handles.Table.Data{9, 2};
+        fpetbatch.cov.in.ic = str2num(handles.Table.Data{10, 2});
     case 11 % ICA
         fpetbatch.run_ica = strcmp(handles.Table.Data{1, 2}, 'true');
         fpetbatch.ica.in.data = handles.Table.Data{2, 2};

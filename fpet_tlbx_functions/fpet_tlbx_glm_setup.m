@@ -1,4 +1,4 @@
-function [Y, pn] = fpet_tlbx_glm_setup(fpetbatch);
+function [Y, fpet_param] = fpet_tlbx_glm_setup(fpetbatch);
 % fPET toolbox: set default values for glm
 % 
 % Copyright (C) 2024, Neuroimaging Labs, Medical University of Vienna, Austria
@@ -45,11 +45,17 @@ if isfield(fpetbatch.glm.in,'data_incomplete') && isfield(fpetbatch.glm.in.data_
         fPET.glm.X.incomplete.start = fpetbatch.glm.in.data_incomplete.start;
         fPET.glm.X.incomplete.end = fpetbatch.glm.in.data_incomplete.end;
     end
+    if isfield(fpetbatch.glm.in.data_incomplete,'no_anchor') && ~isempty(fpetbatch.glm.in.data_incomplete.no_anchor) && (fpetbatch.glm.in.data_incomplete.no_anchor == 1)
+        fPET.glm.X.incomplete.no_anchor = 1;
+    else
+        fPET.glm.X.incomplete.no_anchor = 0;
+    end
 else
     fPET.Y.incomplete = 0;
     fPET.glm.X.incomplete.start = fpet_defaults.glm.in.data_incomplete.start;
     fPET.glm.X.incomplete.end = fpet_defaults.glm.in.data_incomplete.end;
 end
+
 
 
 % mandatory input
@@ -86,7 +92,7 @@ fPET.tvec = fPET.tvec - fPET.framelength/2;
 
 % optional input, set defaults if undefined
 % mask(s) with voxels not included in baseline definition
-if isfield(fpetbatch.glm.in.mask,'bl_excl') && ~isempty(fpetbatch.glm.in.mask.bl_excl)
+if isfield(fpetbatch.glm.in.mask,'bl_excl') && ~isempty(fpetbatch.glm.in.mask.bl_excl) && ~isempty(fpetbatch.glm.in.mask.bl_excl{1})
     fPET.glm.M.blex.h = {};
     fPET.glm.M.blex.th = [];
     nr_m_blex = numel(fpetbatch.glm.in.mask.bl_excl);
@@ -223,13 +229,41 @@ end
 fPET.glm.X.add = X.add;
 
 % baseline regressor definition
-X.bl = zeros(numel(Y.h),1);
-for ind = 1:numel(Y.h)
-    temp = Y.d(:,:,:,ind);
-    X.bl(ind,1) = nanmean(temp(M.bl.d));
+fPET.glm.X.bl_prob = 0;
+if isfield(fpetbatch.glm.in,'bl_prob') && ~isempty(fpetbatch.glm.in.bl_prob) && (fpetbatch.glm.in.bl_prob == 1)
+    % probabilistic
+    temp = which('fpet_tlbx_run');
+    M.bl_prob.h = spm_vol(fullfile(temp(1:end-16),'fpet_data','prob','FDG_human_KPM.nii'));
+    M.bl_prob.d = spm_read_vols(M.bl_prob.h);
+    M.bl_prob.d(isinf(M.bl_prob.d)) = 0;
+    M.bl_prob.d(isnan(M.bl_prob.d)) = 0;
+    [~,bl_prob_max] = max(M.bl_prob.d,[],4);
+    bl_prob_max(M.bl.d==0) = 0;
+    X.bl = zeros(numel(Y.h),size(M.bl_prob.d,4));
+    for ind_bl = 1:size(M.bl_prob.d,4)
+        for ind = 1:numel(Y.h)
+            temp = Y.d(:,:,:,ind);
+            if nnz(bl_prob_max==ind_bl)
+                X.bl(ind,ind_bl) = nanmean(temp(bl_prob_max==ind_bl));
+            else
+                X.bl(ind,ind_bl) = nanmean(temp(M.bl.d));
+            end
+        end
+    end
+    clear temp;
+    X.bl(isnan(X.bl)) = 0;
+    fpet_param.M.bl_prob = M.bl_prob;
+    fPET.glm.X.bl_prob = 1;
+else
+    % standard
+    X.bl = zeros(numel(Y.h),1);
+    for ind = 1:numel(Y.h)
+        temp = Y.d(:,:,:,ind);
+        X.bl(ind,1) = nanmean(temp(M.bl.d));
+    end
+    clear temp;
+    X.bl(isnan(X.bl)) = 0;
 end
-clear temp;
-X.bl(isnan(X.bl)) = 0;
 % third order polynomial
 if isfield(fpetbatch.glm.in,'bl_type') && ~isempty(fpetbatch.glm.in.bl_type) && (fpetbatch.glm.in.bl_type == 2)
     if fpetbatch.glm.in.time == 1
@@ -237,26 +271,34 @@ if isfield(fpetbatch.glm.in,'bl_type') && ~isempty(fpetbatch.glm.in.bl_type) && 
     elseif fpetbatch.glm.in.time == 2
         bl_start_fit = fpetbatch.glm.in.bl_start_fit;
     end
-    x = [bl_start_fit:numel(X.bl)]';
+    x = [bl_start_fit:numel(X.bl(:,1))]';
     X_temp = [X.stim.d X.motion.d_final X.add.d];
-    b = glmfit([x x.^2 x.^3 X_temp(bl_start_fit:end,:)], X.bl(bl_start_fit:end));
-    bl_fit = b(1) + b(2)*x + b(3)*(x.^2) + b(4)*(x.^3);
-    X.bl = [X.bl(1:bl_start_fit-1); bl_fit];
+    for ind_bl = 1:size(X.bl,2)
+        b = glmfit([x x.^2 x.^3 X_temp(bl_start_fit:end,:)], X.bl(bl_start_fit:end,ind_bl));
+        bl_fit = b(1) + b(2)*x + b(3)*(x.^2) + b(4)*(x.^3);
+        X.bl(:,ind_bl) = [X.bl(1:bl_start_fit-1,ind_bl); bl_fit];
+    end
     fPET.glm.X.start_fit = bl_start_fit;
 end
+    
 fPET.glm.X.bl = X.bl;
 
 % orthogonalization of stimulation regressors
+if isfield(fpetbatch.glm.in,'bl_prob') && ~isempty(fpetbatch.glm.in.bl_prob) && (fpetbatch.glm.in.bl_prob == 1)
+    X.bl_temp = mean(X.bl,2);
+else
+    X.bl_temp = X.bl;
+end
 if (~isfield(fpetbatch.glm.in,'regr_orth') || isempty(fpetbatch.glm.in.regr_orth) || (fpetbatch.glm.in.regr_orth == 1)) && (~isempty(X.stim.d))
     X.stim.d_orth = zeros(size(X.stim.d));
     for ind = 1:nr_regr_stim
-        temp = spm_orth([X.bl X.stim.d(:,ind)]);
+        temp = spm_orth([X.bl_temp X.stim.d(:,ind)]);
         X.stim.d_orth(:,ind) = temp(:,2);
     end
     fPET.glm.X.stim.d_orth = X.stim.d_orth;
-    fPET.glm.X.all = [X.bl X.stim.d_orth X.add.d X.motion.d_final];
+    fPET.glm.X.all = [X.bl_temp X.stim.d_orth X.add.d X.motion.d_final];
 else
-    fPET.glm.X.all = [X.bl X.stim.d X.add.d X.motion.d_final];
+    fPET.glm.X.all = [X.bl_temp X.stim.d X.add.d X.motion.d_final];
 end
 
 % names of regressors
@@ -319,7 +361,7 @@ else
 end
 
 % adding anchor point for incomplete data (advanced)
-if (fPET.Y.incomplete == 1) && (fPET.glm.X.incomplete.start(1) ~= 1)
+if (fPET.Y.incomplete == 1) && (fPET.glm.X.incomplete.start(1) ~= 1) && (fPET.glm.X.incomplete.no_anchor == 0)
     fPET.glm.weight = cat(1, 10, fPET.glm.weight);
 %     Y.d = cat(4, zeros([Y.h(1).dim 1]), Y.d);     % done in calc after filtering
     fPET.glm.X.bl = cat(1, zeros(1,size(X.bl,2)), X.bl);
@@ -341,7 +383,7 @@ end
 
 % save values
 save(fullfile(fPET.dir.result, 'fPET_glm.mat'), 'fPET');
-pn = fPET.dir.result;
+fpet_param.pn = fPET.dir.result;
 
 end
 
