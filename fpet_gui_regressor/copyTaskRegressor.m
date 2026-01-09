@@ -4,7 +4,7 @@ function copyTaskRegressor(handles)
 % 
 % Copyright (C) 2024, Neuroimaging Labs, Medical University of Vienna, Austria
 if ~isempty(handles.TaskRegressors)
-    newFig = uifigure('Name', 'Copy Task Regressor', 'Position', [300, 300, 300, 150]);
+    newFig = uifigure('Name', 'Copy Task Regressor', 'Position', [300, 300, 300, 150], 'WindowStyle', 'modal');
     % Assuming regressor copying involves selecting from an existing list
     regressorList = handles.TaskRegressors(:, 1);
     dropdown = uidropdown(newFig, 'Items', regressorList, 'Position', [20, 100, 260, 22]);

@@ -5,7 +5,7 @@ function removeTaskRegressor(handles)
 % Copyright (C) 2024, Neuroimaging Labs, Medical University of Vienna, Austria
 
 if ~isempty(handles.TaskRegressors)
-    newFig = uifigure('Name', 'Remove Task Regressor', 'Position', [300, 300, 300, 150]);
+    newFig = uifigure('Name', 'Remove Task Regressor', 'Position', [300, 300, 300, 150], 'WindowStyle', 'modal');
     regressorList = handles.TaskRegressors(:, 1);
     dropdown = uidropdown(newFig, 'Items', regressorList, 'Position', [20, 70, 260, 22]);
     uibutton(newFig, 'Text', 'Remove', 'Position', [100, 20, 100, 30], ...

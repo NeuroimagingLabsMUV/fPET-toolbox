@@ -38,7 +38,7 @@ switch menu
             case 2
                 text = {'Variable: fpetbatch.glm.in.fil.order'; 'Low-pass filter order.'};
             case 3
-                text = {'Variable: fpetbatch.glm.in.fil.cutoff'; 'Cutoff frequency for low-pass filter given in seconds or frames. Default values are given in seconds [100s 10s].  Set as -1 to disable bandpass filter in the CompCor method. Use half of task length as default.'};
+                text = {'Variable: fpetbatch.glm.in.fil.cutoff'; 'Cutoff frequency for low-pass filter given in seconds or frames.'};
             case 4
                 text = {'Variable: fpetbatch.glm.in.regr_motion'; 'Motion nuisance regressors from the SPM realignment step. Input is a .txt or .mat file'};
             case 5

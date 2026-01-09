@@ -29,7 +29,7 @@ function onTreeSelection(src, event)
             else
                 tmp = cell2mat(fpetbatch.glm.in.mask.bl_excl);
             end           
-            updateTable(handles.Table, {'Baseline Mask', fpetbatch.glm.in.mask.bl; 'Exclude Mask Threshold', char(strjoin(string(fpetbatch.glm.in.mask.th), ',')); 'Baseline Exclude Mask(s)', tmp; 'Baseline definition', convertValtoBL(fpetbatch.glm.in.type); 'GLM Calculation Mask', fpetbatch.glm.in.mask.calc; 'Startpoint Of Baseline Fit', num2str(fpetbatch.glm.in.bl_start_fit)});
+            updateTable(handles.Table, {'Baseline Mask', fpetbatch.glm.in.mask.bl; 'Exclude Mask Threshold', char(strjoin(string(fpetbatch.glm.in.mask.th), ',')); 'Baseline Exclude Mask(s)', tmp; 'Baseline definition', convertValtoBL(fpetbatch.glm.in.bl_type); 'GLM Calculation Mask', fpetbatch.glm.in.mask.calc; 'Startpoint Of Baseline Fit', num2str(fpetbatch.glm.in.bl_start_fit)});
         case 'Filtering and nuissance regression'
             handles.Menu = 3;
             updateTable(handles.Table, {'Low-pass Filter', convertBinaryToTrueFalse(fpetbatch.glm.in.fil.apply); 'Filter Order', num2str(fpetbatch.glm.in.fil.order); 'Filter Cut-Off Frequency', num2str(fpetbatch.glm.in.fil.cutoff); 'Motion Regressors', fpetbatch.glm.in.regr_motion; 'Apply PCA to Regressors', convertBinaryToTrueFalse(fpetbatch.glm.in.regr_motion_pca); 'Additional Regressors', fpetbatch.glm.in.regr_add});

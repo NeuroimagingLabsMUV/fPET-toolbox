@@ -20,6 +20,15 @@ handles.SavedInputs.T7R3C2 = fpetbatch.tacplot.in.dir; %TAC
 handles.SavedInputs.T8R2C2 = fpetbatch.conn.in.data;%conn
 handles.SavedInputs.T10R2C2 = fpetbatch.cov.in.data; %cov
 handles.SavedInputs.T11R2C2 = fpetbatch.ica.in.data;%ica
+
+
+%{'tt'}    {'Onset: 1 - End: 2'  }
+%{'t2'}    {'Onset: 22 - End: 33'}
+handles.TaskRegressors = [];
+for rr = 1 : size(fpetbatch.glm.in.regr,1)
+    handles.TaskRegressors{rr,1} = (fpetbatch.glm.in.regr(rr).name);
+    handles.TaskRegressors{rr,2} = (['Onset: ' num2str(fpetbatch.glm.in.regr(rr).start) ' - End: ' num2str(fpetbatch.glm.in.regr(rr).end)]);
+end
 fpetbatch = updateDefaultsWrapper(handles, fpetbatch);
 
 

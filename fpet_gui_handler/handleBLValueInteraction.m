@@ -11,7 +11,7 @@ else
     displayValue = currentValue; % Handle other unexpected values
 end
 % Dropdown with custom inputs
-newFig = uifigure('Name', 'Edit Value', 'Position', [300, 300, 300, 150]);
+newFig = uifigure('Name', 'Edit Value', 'Position', [300, 300, 300, 150], 'WindowStyle', 'modal');
 dropdown = uidropdown(newFig, 'Items', {'Mask', '3rd Order Polynomial'}, 'Position', [20, 70, 260, 22]);
 dropdown.Value = displayValue;
 uibutton(newFig, 'Text', 'Save', 'Position', [100, 20, 100, 30], ...
