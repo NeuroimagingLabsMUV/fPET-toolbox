@@ -10,6 +10,13 @@ fPET enables the identification of stimulation-induced changes in glucose metabo
 [Visit the fPET Toolbox webpage](https://neuroimaginglabsmuv.github.io/fPET-toolbox/)
 
 ---
+## Latest Release Notes
+__Version 2.0.1:__
+
+New tools for
+- Molecular connectivity (CompCor, spatio-temporal filter, baseline normalization, Euclidian distance)
+- Molecular covariance (PCA, ICA, jackknife)
+Updates for GLM, plotting TACs and the GUI.
 
 ## Authors and Affiliation
 - Andreas Hahn
@@ -66,4 +73,5 @@ For any issues, bug reports, feature requests, or study design consultations, pl
 
 
 __Feel free to reach out if you'd like to explore potential collaborations or need further guidance with your fPET studies.__
+
 
