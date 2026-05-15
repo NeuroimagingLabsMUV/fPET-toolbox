@@ -306,11 +306,13 @@ img.pull-left {
 .blockquote-box2{margin-bottom:0px}
 .blockquote-box .square{width:100px;min-height:50px;margin-right:22px;text-align:center!important;background-color:#E6E6E6;padding:20px 0}
 .blockquote-box2 .square2{width:50px;min-height:20px;margin-right:12px;text-align:center!important;background-color:#E6E6E6;padding:10px 0}
+.blockquote-box3 .square3{width:100px;min-height:50px;margin-right:22px;text-align:center!important;background-color:#E6E6E6;padding:20px 0}
 .blockquote-box2 .square3{width:50px;min-height:20px;margin-right:12px;text-align:center!important;background-color:#E6E6E6;padding:10px 0}
 .blockquote-box.blockquote-primary{border-color:#357EBD}
 .blockquote-box.blockquote-primary .square{background-color:#20164b;color:#FFF}
 .blockquote-box2.blockquote-primary .square2{background-color:#20164b;color:#FFF}
 .blockquote-box2.blockquote-primary .square3{background-color:#0e8373;color:#FFF}
+.blockquote-box3.blockquote-primary .square3{background-color:#0e8373;color:#FFF}
 
 .blockquote-box.blockquote-success{border-color:#4CAE4C}
 .blockquote-box.blockquote-success .square{background-color:#5CB85C;color:#FFF}
