@@ -68,6 +68,8 @@ fPET.ica.R.sep_matr = R.d_re(ind_max).sep_matr;
 % save data
 R.h_temp = fPET.Y(1).h_orig(1);
 R.h_temp.dt(1) = 16;        % single
+R.h_temp.pinfo(1) = 1;
+R.h_temp.pinfo(2) = 0;
 for ind = 1 : size(R.d_final_re,1)
     R.h_temp.fname = fullfile(fPET.dir.result, [prefix num2str(ind) '.nii']);
 %     R.d_final = reshape(zscore(R.d_final_re(ind,:)), size(Y.d,1:3));

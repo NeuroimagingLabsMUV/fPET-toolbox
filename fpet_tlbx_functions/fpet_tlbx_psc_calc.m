@@ -58,6 +58,8 @@ for ind_s = 1:size(fPET.glm.X.stim.d,2)
     % save data
     R.stim.h = B.stim.h;
     R.stim.h.dt(1) = 16;        % single
+	R.stim.h.pinfo(1) = 1;
+	R.stim.h.pinfo(2) = 0;
     
     R.stim.h.fname = fullfile(fPET.dir.result, sprintf('b%i_%s_PSC.nii', ind_s+2, fPET.glm.X.name{ind_s+2}));
     spm_write_vol(R.stim.h, reshape(R.stim.d_re, R.stim.h.dim));

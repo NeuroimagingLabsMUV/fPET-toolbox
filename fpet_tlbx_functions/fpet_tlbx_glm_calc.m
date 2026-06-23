@@ -86,6 +86,8 @@ end
 % save data
 R.h_temp = Y.h_orig(1);
 R.h_temp.dt(1) = 16;        % single
+R.h_temp.pinfo(1) = 1;
+R.h_temp.pinfo(2) = 0;
 for ind = 1:size(R.b_re,2)
     R.h_temp.fname = fullfile(fPET.dir.result, sprintf('b%i_%s.nii', ind, fPET.glm.X.name{ind}));
     spm_write_vol(R.h_temp, reshape(R.b_re(:,ind), R.h_temp.dim));

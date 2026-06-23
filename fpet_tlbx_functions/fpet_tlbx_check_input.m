@@ -259,34 +259,51 @@ elseif batchtype == 3
     end
     
     % time
-    if ~isfield(fpetbatch.quant.in,'time') || isempty(fpetbatch.quant.in.time)
-        disp('timing for quantification (seconds=1 or minutes=2) not defined.');
-        nr_err_quant = nr_err_quant + 1;
-    else
-        if ~any(fpetbatch.quant.in.time==[1 2])
-            disp('definition of timing for quantification is unknown, should be 1=seconds or 2=minutes.');
+    if ~isfield(fpetbatch.quant.in,'type') || (isfield(fpetbatch.quant.in,'type') && ~isempty(fpetbatch.quant.in.type) && ((fpetbatch.quant.in.type==1) || (fpetbatch.quant.in.type==3)))
+        if ~isfield(fpetbatch.quant.in,'time') || isempty(fpetbatch.quant.in.time)
+            disp('timing for quantification (seconds=1 or minutes=2) not defined.');
             nr_err_quant = nr_err_quant + 1;
-        end
-    end
-
-    % blood data
-    if ~isfield(fpetbatch.quant.in,'wb') || isempty(fpetbatch.quant.in.wb)
-        if ~isfield(fpetbatch.quant.in,'plasma') || isempty(fpetbatch.quant.in.plasma)
-            disp('whole blood and plasma data not defined.')
-            nr_err_quant = nr_err_quant + 1;
-        end
-        if ~isfield(fpetbatch.quant.in,'pwbr') || isempty(fpetbatch.quant.in.pwbr)
-            disp('warning: whole blood data and plasma/whole blood ratio not defined, vB is set to 0.')
-        end
-    else
-        if (~isfield(fpetbatch.quant.in,'plasma') || isempty(fpetbatch.quant.in.plasma)) && (~isfield(fpetbatch.quant.in,'pwbr') || isempty(fpetbatch.quant.in.pwbr))
-            disp('whole blood data provided, but plasma data or plasma/whole blood ratio missing.')
-            nr_err_quant = nr_err_quant + 1;
+        else
+            if ~any(fpetbatch.quant.in.time==[1 2])
+                disp('definition of timing for quantification is unknown, should be 1=seconds or 2=minutes.');
+                nr_err_quant = nr_err_quant + 1;
+            end
         end
     end
     
-    if ~isfield(fpetbatch.quant.in,'bloodlvl') || isempty(fpetbatch.quant.in.bloodlvl)
-        disp('prescan blood level not defined, only net influx constant will be calculated.')
+    % blood data
+    if ~isfield(fpetbatch.quant.in,'type') || (isfield(fpetbatch.quant.in,'type') && ~isempty(fpetbatch.quant.in.type) && ((fpetbatch.quant.in.type==1) || (fpetbatch.quant.in.type==3)))
+        if ~isfield(fpetbatch.quant.in,'wb') || isempty(fpetbatch.quant.in.wb)
+            if ~isfield(fpetbatch.quant.in,'plasma') || isempty(fpetbatch.quant.in.plasma)
+                disp('whole blood and plasma data not defined.')
+                nr_err_quant = nr_err_quant + 1;
+            end
+            if ~isfield(fpetbatch.quant.in,'pwbr') || isempty(fpetbatch.quant.in.pwbr)
+                disp('warning: whole blood data and plasma/whole blood ratio not defined, vB is set to 0.')
+            end
+        else
+            if (~isfield(fpetbatch.quant.in,'plasma') || isempty(fpetbatch.quant.in.plasma)) && (~isfield(fpetbatch.quant.in,'pwbr') || isempty(fpetbatch.quant.in.pwbr))
+                disp('whole blood data provided, but plasma data or plasma/whole blood ratio missing.')
+                nr_err_quant = nr_err_quant + 1;
+            end
+        end
+
+        if ~isfield(fpetbatch.quant.in,'bloodlvl') || isempty(fpetbatch.quant.in.bloodlvl)
+            disp('prescan blood level not defined, only net influx constant will be calculated.')
+        end
+    end
+    % reference region
+    if isfield(fpetbatch.quant.in,'type') && ~isempty(fpetbatch.quant.in.type) && ((fpetbatch.quant.in.type==2) || (fpetbatch.quant.in.type==3))
+        if ~isfield(fpetbatch.quant.in,'mask') || ~isfield(fpetbatch.quant.in.mask,'rr') || isempty(fpetbatch.quant.in.mask.rr)
+            disp('mask for reference region is not defined.');
+            nr_err_quant = nr_err_quant + 1;
+        else
+            M.rr.h = spm_vol(fpetbatch.quant.in.mask.rr);
+            if exist('fPET','var') && isfield(fPET,'Y') && ~isequal(fPET.Y(1).h(1).dim(1:3), M.rr.h.dim)
+                disp('spatial dimensions of reference region do not match input data.');
+                nr_err_quant = nr_err_quant + 1;
+            end
+        end
     end
     
     if nr_err_quant > 0

@@ -54,6 +54,8 @@ if selectedColumn == 2
             handlePadValueInteraction(src, selectedRow, selectedColumn, currentValue);
         case 18
             handleBPValueInteraction(src, selectedRow, selectedColumn, currentValue);
+        case 19
+            handleQuantValueInteraction2(src, selectedRow, selectedColumn, currentValue);
     end
 end
 end

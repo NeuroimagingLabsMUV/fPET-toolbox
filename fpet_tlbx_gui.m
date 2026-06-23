@@ -53,19 +53,19 @@ handles.Table = table;
 handles.TextArea = textArea;
 handles.TaskRegressors = {}; % Store task regressors
 
-handles.InteractionTypes =  [[1, 10, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0]; ...        %GLM - basic
-                            [10, 2, 4, 6, 10, 2, 0, 0, 0, 0, 0, 0, 0]; ...        %GLM - mask
-                            [1, 2, 2, 11, 1, 11, 0, 0, 0, 0, 0, 0, 0]; ...        %GLM - fltr
-                            [7, 8, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; ...          %GLM - regrs
-                            [1, 1, 13, 11, 11, 11, 11, 12, 2, 2, 2, 2, 0]; ...    %GLM - quant
-                            [17, 1, 14, 2, 2, 1, 2, 2, 0, 0, 0, 0, 0]; ...        %GLM - adv
-                            [1, 2, 15, 10, 1, 1, 1, 0, 0, 0, 0, 0, 0]; ...        %tacplot
-                            [1, 10, 16, 2, 4, 11, 1, 11, 10, 2, 5, 10, 10]; ...     %connetivity - basic | placed 6 -7 idx:  2, 18
-                            [2, 2, 17, 10, 2, 10, 18, 2, 2, 0, 0, 0, 0]; ...       %connectivity - adv
-                            [1, 4, 10, 4, 11, 1, 1, 2, 1, 2, 0, 0, 0]; ...        %covariance
-                            [1, 4, 1, 2, 2, 2, 2, 2, 5, 10, 0, 0, 0]; ...         %ica
-                            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; ...          %run
-                            [3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0]];              %Mandatory settings
+handles.InteractionTypes =  [[1, 10, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; ...        %GLM - basic
+                            [10, 2, 4, 6, 10, 2, 0, 0, 0, 0, 0, 0, 0, 0]; ...        %GLM - mask
+                            [1, 2, 2, 11, 1, 11, 0, 0, 0, 0, 0, 0, 0, 0]; ...        %GLM - fltr
+                            [7, 8, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; ...          %GLM - regrs
+                            [1, 1, 13, 11, 11, 11, 11, 12, 2, 2, 2, 2, 19, 10]; ...    %GLM - quant
+                            [17, 1, 14, 2, 2, 1, 2, 2, 0, 0, 0, 0, 0, 0]; ...        %GLM - adv
+                            [1, 2, 15, 10, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]; ...        %tacplot
+                            [1, 10, 16, 2, 4, 11, 1, 11, 10, 2, 5, 10, 10, 0]; ...     %connetivity - basic | placed 6 -7 idx:  2, 18
+                            [2, 2, 17, 10, 2, 10, 18, 2, 2, 0, 0, 0, 0, 0]; ...       %connectivity - adv
+                            [1, 4, 10, 4, 11, 1, 1, 2, 1, 2, 0, 0, 0, 0]; ...        %covariance
+                            [1, 4, 1, 2, 2, 2, 2, 2, 5, 10, 0, 0, 0, 0]; ...         %ica
+                            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; ...          %run
+                            [3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0]];              %Mandatory settings
 handles.PreviousTableData = table.Data; % Store the previous table data for comparison
 handles.Menu = 0;
 guidata(fig, handles);

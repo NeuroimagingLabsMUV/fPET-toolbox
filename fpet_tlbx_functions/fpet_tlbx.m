@@ -16,10 +16,10 @@ function fpet_tlbx(fpetbatch)
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 %
-% Version: 2.0.1
+% Version: 2.1.0
 
 % set version
-v = '2.0.1';
+v = '2.1.0';
 fpetbatch.v = v;
 
 disp('*****')

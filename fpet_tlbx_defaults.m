@@ -63,6 +63,8 @@ fpet_defaults.quant.in.lc = 0.89;
 fpet_defaults.quant.in.vb = 0.05;
 fpet_defaults.quant.in.bloodlvl = [];
 fpet_defaults.quant.in.tstar = 1/3;
+fpet_defaults.quant.in.type = 1;
+fpet_defaults.quant.in.mask.rr = '';
 
 
 % tac plot

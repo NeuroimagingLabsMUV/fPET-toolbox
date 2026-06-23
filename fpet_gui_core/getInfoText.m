@@ -81,6 +81,11 @@ switch menu
                 text = {'Variable: fpetbatch.quant.in.bloodlvl'; 'Input for participants blood glucose level.'};
             case 12
                 text = {'Variable: fpetbatch.quant.in.tstar'; 'Input T*, which is the time to start fit of Patlak plot, given as fraction of full scan duration. Default=1/3 of scan duration'};
+            case 13
+                text = {'Variable: fpetbatch.quant.in.type'; 'Patlak reference region, allows the user to choose how the data is quantified. Options: blood (default)/reference region/both'};
+            case 14
+                text = {'Variable: fpetbatch.quant.in.mask.rr'; 'Reference region mask, used to extract the reference region for subsequent quantification.'};
+
         end
     case 6
         switch row

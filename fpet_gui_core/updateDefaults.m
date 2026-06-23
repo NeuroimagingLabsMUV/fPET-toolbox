@@ -64,6 +64,8 @@ switch handles.Menu
         fpetbatch.quant.in.vb = str2num(handles.Table.Data{10, 2});
         fpetbatch.quant.in.bloodlvl = str2num(handles.Table.Data{11, 2});
         fpetbatch.quant.in.tstar = str2num(handles.Table.Data{12, 2});
+        fpetbatch.quant.in.type = convertNameQuantToVal(handles.Table.Data{13,2});
+        fpetbatch.quant.in.mask.rr = handles.Table.Data{14,2};
     case 6 % Advanced Settings
         fpetbatch.glm.in.regr_motion_incomplete = convertPadToVal(handles.Table.Data{1, 2});
         fpetbatch.glm.in.regr_orth = strcmp(handles.Table.Data{2, 2}, 'true');

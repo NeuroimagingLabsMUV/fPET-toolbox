@@ -5,7 +5,7 @@ function error_flag = fpet_tlbx_check_exist(fpetbatch);
 
 error_flag = 0;
 overwrite_flag = 0;
-exist_flag = zeros(1,7);
+exist_flag = zeros(1,8);
 
 if isfield(fpetbatch,'dir') && isfield(fpetbatch.dir,'result') && ~isempty(fpetbatch.dir.result)
     if ~exist(fpetbatch.dir.result, 'dir')
@@ -42,9 +42,18 @@ if isfield(fpetbatch,'run_quant') && (fpetbatch.run_quant == 1)
     pnfn = fullfile(fpetbatch.dir.result, 'fPET_glm.mat');
     if exist(pnfn, 'file')
         load(pnfn);
-        if isfield(fPET,'quant') && isfield(fPET.quant,'complete') && (fPET.quant.complete == 1)
-            disp('Quantification results already exist.')
-            exist_flag(3) = 1;
+
+        if ~isfield(fpetbatch.quant.in,'type') || (isfield(fpetbatch.quant.in,'type') && ~isempty(fpetbatch.quant.in.type) && ((fpetbatch.quant.in.type==1) || (fpetbatch.quant.in.type==3)))
+            if isfield(fPET,'quant') && isfield(fPET.quant,'complete') && (fPET.quant.complete(1) == 1)
+                disp('Quantification results based on AIF already exist.')
+                exist_flag(3) = 1;
+            end
+        end
+        if isfield(fpetbatch.quant.in,'type') && ~isempty(fpetbatch.quant.in.type) && ((fpetbatch.quant.in.type==2) || (fpetbatch.quant.in.type==3))
+            if isfield(fPET,'quant') && isfield(fPET.quant,'complete') && numel(fPET.quant.complete)>1 && (fPET.quant.complete(2)==1)
+                disp('Quantification results based on reference region already exist.')
+                exist_flag(8) = 1;
+            end
         end
     end
 end
@@ -115,6 +124,11 @@ if (overwrite_flag == 1) || (isfield(fpetbatch,'overwrite') && (fpetbatch.overwr
                 delete(pnfn);
                 exist_flag(3) = 0;
             end
+            pnfn = fullfile(fPET.dir.result, sprintf('b%i_%s_Ki_ref.nii', ind, fPET.glm.X.name{ind}));
+            if exist(pnfn,'file')
+                delete(pnfn);
+                exist_flag(8) = 0;
+            end
             pnfn = fullfile(fPET.dir.result, sprintf('b%i_%s_CMRGlu.nii', ind, fPET.glm.X.name{ind}));
             if exist(pnfn,'file')
                 delete(pnfn);
@@ -147,6 +161,15 @@ if (overwrite_flag == 1) || (isfield(fpetbatch,'overwrite') && (fpetbatch.overwr
             if exist(pnfn,'file')
                 delete(pnfn);
             end
+        end
+    end
+    if exist_flag(8) == 1
+        pnfn = fullfile(fpetbatch.dir.result, 'fPET_glm.mat');
+        load(pnfn);
+        nr_regr_stim = size(fPET.glm.X.stim.d,2);
+        for ind = 1:nr_regr_stim+1
+            pnfn = fullfile(fPET.dir.result, sprintf('b%i_%s_Ki_ref.nii', ind+1, fPET.glm.X.name{ind+1}));
+            delete(pnfn);
         end
     end
     % tacplot -> no action required
