@@ -1,3 +1,4 @@
+
 # fPET Toolbox
 ![fPET Banner](img/github_banner.png)
 
@@ -11,9 +12,13 @@ fPET enables the identification of stimulation-induced changes in glucose metabo
 
 ---
 ## Latest Release Notes
+__Version 2.1.0:__
+
+New: Patlak plot with reference region.
+
 __Version 2.0.1:__
 
-New tools for
+New tools for:
 - Molecular connectivity (CompCor, spatio-temporal filter, baseline normalization, Euclidian distance)
 - Molecular covariance (PCA, ICA, jackknife)
 
@@ -37,6 +42,11 @@ https://doi.org/10.1007/s00259-024-06675-0
 
 In addition, when using the spatio-temporal filter for molecular connectivity please cite:
 https://doi.org/10.1038/s41597-020-00699-5
+
+In addition, when using CompCor or other molecular connectivity/covariance approaches,
+please cite the relevant manuscript:
+https://doi.org/10.1177/0271678X261431043
+https://doi.org/10.64898/2025.12.17.694867
 
 ## Installation
 Download the fPET Toolbox from GitHub.
@@ -74,6 +84,4 @@ For any issues, bug reports, feature requests, or study design consultations, pl
 
 
 __Feel free to reach out if you'd like to explore potential collaborations or need further guidance with your fPET studies.__
-
-
 
